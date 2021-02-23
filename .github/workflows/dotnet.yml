@@ -21,7 +21,7 @@ jobs:
       run: dotnet test Andromeda.Network.sln -c Release --no-build
 
     - name: dotnet pack
-      run: dotnet pack Andromeda.Network.sln -c Release --no-build --include-symbols
+      run: dotnet pack Andromeda.Network.sln -c Release --no-build
 
     - name: push packages
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
