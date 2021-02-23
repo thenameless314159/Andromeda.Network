@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Andromeda.Network", "src\Andromeda.Network\Andromeda.Network.csproj", "{76B1326B-A8E1-4AC6-8F39-5EDC797BE7A3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3DA41DC1-D925-4BC9-8585-A9A74719E2DD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{76B1326B-A8E1-4AC6-8F39-5EDC797BE7A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76B1326B-A8E1-4AC6-8F39-5EDC797BE7A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76B1326B-A8E1-4AC6-8F39-5EDC797BE7A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76B1326B-A8E1-4AC6-8F39-5EDC797BE7A3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{76B1326B-A8E1-4AC6-8F39-5EDC797BE7A3} = {3DA41DC1-D925-4BC9-8585-A9A74719E2DD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D17B1249-83FB-4BFB-85AF-1525DD3DB2F2}
+	EndGlobalSection
+EndGlobal
