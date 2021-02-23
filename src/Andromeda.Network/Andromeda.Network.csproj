@@ -2,15 +2,13 @@
 
   <PropertyGroup>
 	  <Nullable>Enable</Nullable>
+	  <Authors>thenameless314159</Authors>
 	  <TargetFramework>net5.0</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <RepositoryUrl>https://github.com/thenameless314159/Andromeda.Network</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/thenameless314159/Andromeda.Network</PackageProjectUrl>
+	  <Description>.NET5 networking library based on BedrockFramework and AspNetCore sources. Provide high performance, low level networking APIs for building custom servers and clients.</Description>
+	  <PackageIcon>andromeda_icon3.png</PackageIcon>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -31,6 +29,13 @@
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>SocketsStrings.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\andromeda_icon3.png">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
 	</ItemGroup>
 
 </Project>
