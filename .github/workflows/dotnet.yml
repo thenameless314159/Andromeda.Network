@@ -23,16 +23,6 @@ jobs:
     - name: dotnet pack
       run: dotnet pack Andromeda.Network.sln -c Release --no-build --include-symbols
 
-    - name: setup nuget
-      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      uses: NuGet/setup-nuget@v1.0.2
-      with:
-        nuget-version: latest
-
-    - name: Set API key
-      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      run: nuget setapikey ${{ secrets.NUGET_API_KEY }}
-
     - name: push packages
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      run: dotnet nuget push **/*.nupkg --skip-duplicate
+      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
