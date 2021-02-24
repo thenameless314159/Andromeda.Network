@@ -21,8 +21,8 @@ jobs:
       run: dotnet test Andromeda.Network.sln -c Release --no-build
 
     - name: dotnet pack
-      run: dotnet pack Andromeda.Network.sln -c Release --no-build
+      run: dotnet pack Andromeda.Network.sln -c Release --no-build --output .
 
     - name: push packages
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      run: dotnet nuget push src\Andromeda.Network\bin\Release\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+      run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
