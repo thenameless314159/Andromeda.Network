@@ -18,17 +18,19 @@ namespace Andromeda.Framing.Extensions
             new PipeFrameEncoder(w, encoder, usePipeSynchronization ? new SemaphoreSlim(1, 1) : default);
 
         public static ValueTask<FlushResult> WriteFrameAsync(this PipeWriter writer, IMetadataEncoder encoder,
-            in Frame frame, CancellationToken token = default)
-        {
-            encoder.WriteMetadata(writer, in frame);
-            return writer.WriteFramePayloadAsync(in frame, token);
-        }
+            in Frame frame, CancellationToken token = default) => !encoder.TryWriteMetadata(writer, frame.Metadata) 
+                // Returns a completed flushResult in case we couldn't write the metadata
+                ? ValueTask.FromResult(new FlushResult(token.IsCancellationRequested, true)) 
+                : writer.WriteFramePayloadAsync(in frame, token);
 
         public static ValueTask<FlushResult> WriteFrameAsync<TMeta>(this PipeWriter writer, IMetadataEncoder encoder,
             in Frame<TMeta> frame, CancellationToken token = default) where TMeta : class, IFrameMetadata
         {
+            // Returns a completed flushResult in case we couldn't write the metadata
+            if (!encoder.TryWriteMetadata(writer, frame.Metadata))
+                return ValueTask.FromResult(new FlushResult(token.IsCancellationRequested, true));
+
             var untyped = frame.AsUntyped();
-            encoder.WriteMetadata(writer, in untyped);
             return writer.WriteFramePayloadAsync(in untyped, token);
         }
 
