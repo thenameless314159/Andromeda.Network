@@ -7,7 +7,7 @@ This project is based on the [*Project Bedrock*](https://github.com/aspnet/AspNe
 - No  protocol logic, only the base socket layers with the same APIs
 - Added an `INetworkServer` interface that expose an `IFeatureCollection` containing an `IServerEndPointsFeature` with the bound endpoints of the configured servers by default. This interface is registered in the relative host service collection when configured using `.ConfigureServer()`.
 - Added an `IConnectionTimeoutFeature` in the server `ConnectionContext`
-- Use latest [`Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets`](https://github.com/dotnet/aspnetcore/tree/main/src/Servers/Kestrel/Transport.Sockets/src) APIs
+- Include latest [`Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets`](https://github.com/dotnet/aspnetcore/tree/main/src/Servers/Kestrel/Transport.Sockets/src) APIs
 - Added configurable logging to server listeners
 
 For further infos about the original project, see the presentation [here](https://speakerdeck.com/davidfowl/project-bedrock).
