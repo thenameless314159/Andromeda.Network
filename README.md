@@ -11,3 +11,8 @@ This project is based on the [*Project Bedrock*](https://github.com/aspnet/AspNe
 - Added configurable logging to server listeners
 
 For further infos about the original project, see the presentation [here](https://speakerdeck.com/davidfowl/project-bedrock).
+
+## Packages
+
+- Andromeda.Network : [![NuGet Badge](https://buildstats.info/nuget/Andromeda.Network)](https://www.nuget.org/packages/Andromeda.Network/)
+- Andromeda.Framing : [![NuGet Badge](https://buildstats.info/nuget/Andromeda.Network.Framing)](https://www.nuget.org/packages/Andromeda.Network.Framing/)
