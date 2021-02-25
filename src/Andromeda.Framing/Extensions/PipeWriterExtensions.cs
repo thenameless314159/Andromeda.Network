@@ -5,10 +5,22 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Andromeda.Framing.Extensions
+namespace Andromeda.Framing
 {
+    /// <summary>
+    /// Extension methods to write frames in any <see cref="PipeWriter"/> and to construct <see cref="IFrameEncoder"/>.
+    /// </summary>
     public static class PipeWriterExtensions
     {
+        /// <summary>
+        /// Create an <see cref="IFrameEncoder{TMetadata}"/> from the specified <see cref="PipeWriter"/> using the provided
+        /// <see cref="MetadataEncoder{TMetadata}"/>.
+        /// </summary>
+        /// <typeparam name="TMetadata">The specific <see cref="IFrameMetadata"/>.</typeparam>
+        /// <param name="w">The pipe writer.</param>
+        /// <param name="encoder">The metadata encoder.</param>
+        /// <param name="usePipeSynchronization">Whether the access to the pipe should be thread synchronized or not.</param>
+        /// <returns>An <see cref="IFrameEncoder{TMetadata}"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IFrameEncoder<TMetadata> AsFrameEncoder<TMetadata>(this PipeWriter w, MetadataEncoder<TMetadata> encoder, bool usePipeSynchronization = false)
             where TMetadata : class, IFrameMetadata => new PipeFrameEncoder<TMetadata>(w, encoder, usePipeSynchronization ? new SemaphoreSlim(1, 1) : default);
@@ -17,10 +29,25 @@ namespace Andromeda.Framing.Extensions
         internal static IFrameEncoder<TMetadata> AsFrameEncoder<TMetadata>(this PipeWriter w, IMetadataEncoder encoder, bool usePipeSynchronization = false)
             where TMetadata : class, IFrameMetadata => new PipeFrameEncoder<TMetadata>(w, encoder, usePipeSynchronization ? new SemaphoreSlim(1, 1) : default);
 
+        /// <summary>
+        /// Create an <see cref="IFrameEncoder"/> from the specified <see cref="PipeWriter"/> using the provided <see cref="IMetadataEncoder"/>.
+        /// </summary>
+        /// <param name="w">The pipe writer.</param>
+        /// <param name="encoder">The metadata encoder.</param>
+        /// <param name="usePipeSynchronization">Whether the access to the pipe should be thread synchronized or not.</param>
+        /// <returns>An <see cref="IFrameEncoder"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IFrameEncoder AsFrameEncoder(this PipeWriter w, IMetadataEncoder encoder, bool usePipeSynchronization = false) =>
             new PipeFrameEncoder(w, encoder, usePipeSynchronization ? new SemaphoreSlim(1, 1) : default);
 
+
+        /// <summary>
+        /// Write a <see cref="Frame"/> in the current writer using the specified <see cref="IMetadataEncoder"/>.
+        /// </summary>
+        /// <param name="writer">The pipe writer.</param>
+        /// <param name="encoder">The metadata encoder.</param>
+        /// <param name="frame">The frame to write.</param>
+        /// <param name="token">The cancellation token.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueTask<FlushResult> WriteFrameAsync(this PipeWriter writer, IMetadataEncoder encoder,
             in Frame frame, CancellationToken token = default) => !encoder.TryWriteMetadata(writer, frame.Metadata) 
@@ -28,6 +55,13 @@ namespace Andromeda.Framing.Extensions
                 ? ValueTask.FromResult(new FlushResult(token.IsCancellationRequested, true)) 
                 : writer.WriteFramePayloadAsync(in frame, token);
 
+        /// <summary>
+        /// Write a <see cref="Frame{TMetadata}"/> in the current writer using the specified <see cref="IMetadataEncoder"/>.
+        /// </summary>
+        /// <param name="writer">The pipe writer.</param>
+        /// <param name="encoder">The metadata encoder.</param>
+        /// <param name="frame">The frame to write.</param>
+        /// <param name="token">The cancellation token.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueTask<FlushResult> WriteFrameAsync<TMeta>(this PipeWriter writer, IMetadataEncoder encoder,
             in Frame<TMeta> frame, CancellationToken token = default) where TMeta : class, IFrameMetadata
@@ -40,10 +74,24 @@ namespace Andromeda.Framing.Extensions
             return writer.WriteFramePayloadAsync(in untyped, token);
         }
 
+        /// <summary>
+        /// Write the payload of the <see cref="Frame"/> in the current writer.
+        /// </summary>
+        /// <param name="writer">The pipe writer.</param>
+        /// <param name="frame">The frame to write.</param>
+        /// <param name="token">The cancellation token.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueTask<FlushResult> WriteFramePayloadAsync(this PipeWriter writer, in Frame frame, 
             CancellationToken token = default) => writer.WriteSequenceAsync(frame.Payload, token);
 
+        /// <summary>
+        /// Write a buffer in the current writer.
+        /// If the buffer length exceed 8192 bytes it'll be written by chunk.
+        /// </summary>
+        /// <param name="writer">The pipe writer.</param>
+        /// <param name="buffer">The buffer to write.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueTask<FlushResult> WriteSequenceAsync(this PipeWriter writer, ReadOnlySequence<byte> buffer,
             CancellationToken token = default) => !buffer.IsSingleSegment
@@ -51,7 +99,7 @@ namespace Andromeda.Framing.Extensions
             : writer.WriteMemoryAsync(buffer.First, token) ;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static async ValueTask<FlushResult> WriteMultiSegmentSequenceAsync(this PipeWriter writer, ReadOnlySequence<byte> buffer,
+        internal static async ValueTask<FlushResult> WriteMultiSegmentSequenceAsync(this PipeWriter writer, ReadOnlySequence<byte> buffer,
             CancellationToken token = default)
         {
             FlushResult flushResult = default;
@@ -66,6 +114,13 @@ namespace Andromeda.Framing.Extensions
             return flushResult;
         }
 
+        /// <summary>
+        /// Write a buffer in the current writer.
+        /// If the buffer length exceed 8192 bytes it'll be written by chunk.
+        /// </summary>
+        /// <param name="writer">The pipe writer.</param>
+        /// <param name="buffer">The buffer to write.</param>
+        /// <param name="token">The cancellation token.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueTask<FlushResult> WriteMemoryAsync(this PipeWriter writer, ReadOnlyMemory<byte> buffer,
             CancellationToken token = default)

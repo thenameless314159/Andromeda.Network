@@ -4,8 +4,19 @@ using System.Runtime.CompilerServices;
 
 namespace Andromeda.Framing
 {
+    /// <summary>
+    /// Extension methods to write <see cref="IFrameMetadata"/> of a <see cref="Frame"/> or <see cref="Frame{TMetadata}"/>
+    /// with a <see cref="IMetadataDecoder"/> in a <see cref="IBufferWriter{T}"/>.
+    /// </summary>
     public static class IMetadataEncoderExtensions
     {
+        /// <summary>
+        /// Try to write the <see cref="IFrameMetadata"/> in the specified writer using the current <see cref="IMetadataEncoder"/>.
+        /// </summary>
+        /// <param name="encoder">The metadata encoder.</param>
+        /// <param name="writer">The buffer writer.</param>
+        /// <param name="metadata">The metadata to write.</param>
+        /// <returns>Whether the metadata could be written or not.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryWriteMetadata(this IMetadataEncoder encoder, IBufferWriter<byte> writer, IFrameMetadata metadata)
         {

@@ -1,5 +1,4 @@
 ﻿using System.IO.Pipelines;
-using Andromeda.Framing.Extensions;
 using Andromeda.Framing.UnitTests.Metadata;
 using Xunit.Abstractions;
 

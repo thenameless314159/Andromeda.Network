@@ -2,7 +2,6 @@
 using System.IO.Pipelines;
 using System.Linq;
 using System.Threading.Tasks;
-using Andromeda.Framing.Extensions;
 using Andromeda.Framing.UnitTests.Metadata;
 using Xunit;
 

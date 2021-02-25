@@ -4,15 +4,23 @@ using System.IO;
 using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
-using Andromeda.Framing.Extensions;
 
 namespace Andromeda.Framing
 {
+    /// <inheritdoc />
     public class PipeFrameEncoder : IFrameEncoder
     {
+        /// <summary>ctor</summary>
+        /// <param name="pipe">The pipe writer.</param>
+        /// <param name="encoder">The metadata encoder.</param>
+        /// <param name="singleWriter">The thread synchronizer.</param>
         public PipeFrameEncoder(PipeWriter pipe, IMetadataEncoder encoder, SemaphoreSlim? singleWriter = default) =>
             (_singleWriter, _encoder, _pipe) = (singleWriter, encoder, pipe);
 
+        /// <summary>ctor</summary>
+        /// <param name="stream">The stream to write in.</param>
+        /// <param name="encoder">The metadata encoder.</param>
+        /// <param name="singleWriter">The thread synchronizer.</param>
         public PipeFrameEncoder(Stream stream, IMetadataEncoder encoder, SemaphoreSlim? singleWriter = default) =>
             (_singleWriter, _encoder, _pipe) = (singleWriter, encoder, PipeWriter.Create(stream));
 
@@ -21,8 +29,11 @@ namespace Andromeda.Framing
         private long _framesWritten;
         protected PipeWriter _pipe;
 
+        /// <inheritdoc />
         public long FramesWritten => Interlocked.Read(ref _framesWritten);
 
+        // TODO: fast path the write logic using the IAsyncEnumerator
+        /// <inheritdoc />
         public ValueTask WriteAsync(IAsyncEnumerable<Frame> frames, CancellationToken token = default)
         {
             var writer = _pipe ?? throw new ObjectDisposedException(GetType().Name);
@@ -68,6 +79,7 @@ namespace Andromeda.Framing
             }
         }
 
+        /// <inheritdoc />
         public ValueTask WriteAsync(IEnumerable<Frame> frames, CancellationToken token = default)
         {
             var writer = _pipe ?? throw new ObjectDisposedException(GetType().Name);
@@ -113,6 +125,7 @@ namespace Andromeda.Framing
             }
         }
 
+        /// <inheritdoc />
         public ValueTask WriteAsync(in Frame frame, CancellationToken token = default)
         {
             var writer = _pipe ?? throw new ObjectDisposedException(GetType().Name);

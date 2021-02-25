@@ -5,10 +5,21 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Andromeda.Framing.Extensions
+namespace Andromeda.Framing
 {
+    /// <summary>
+    /// Extension methods to read frames of any <see cref="PipeReader"/> and to construct <see cref="IFrameDecoder"/>.
+    /// </summary>
     public static class PipeReaderExtensions
     {
+        /// <summary>
+        /// Create an <see cref="IFrameDecoder{TMetadata}"/> from the specified <see cref="PipeReader"/> using the provided <see cref="MetadataDecoder{TMetadata}"/>.
+        /// </summary>
+        /// <typeparam name="TMetadata">The specific <see cref="IFrameMetadata"/>.</typeparam>
+        /// <param name="r">The pipe reader.</param>
+        /// <param name="decoder">The metadata decoder.</param>
+        /// <param name="usePipeSynchronization">Whether the access to the pipe should be thread synchronized or not.</param>
+        /// <returns>An <see cref="IFrameDecoder{TMetadata}"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IFrameDecoder<TMetadata> AsFrameDecoder<TMetadata>(this PipeReader r, MetadataDecoder<TMetadata> decoder, bool usePipeSynchronization = false)
             where TMetadata : class, IFrameMetadata => new PipeFrameDecoder<TMetadata>(r, decoder, usePipeSynchronization ? new SemaphoreSlim(1, 1) : default);
@@ -17,16 +28,23 @@ namespace Andromeda.Framing.Extensions
         internal static IFrameDecoder<TMetadata> AsFrameDecoder<TMetadata>(this PipeReader r, IMetadataDecoder decoder, bool usePipeSynchronization = false)
             where TMetadata : class, IFrameMetadata => new PipeFrameDecoder<TMetadata>(r, decoder, usePipeSynchronization ? new SemaphoreSlim(1, 1) : default);
 
+        /// <summary>
+        /// Create an <see cref="IFrameDecoder"/> from the specified <see cref="PipeReader"/> using the provided <see cref="IMetadataDecoder"/>.
+        /// </summary>
+        /// <param name="r">The pipe reader.</param>
+        /// <param name="decoder">The metadata decoder.</param>
+        /// <param name="usePipeSynchronization">Whether the access to the pipe should be thread synchronized or not.</param>
+        /// <returns>An <see cref="IFrameDecoder"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IFrameDecoder AsFrameDecoder(this PipeReader r, IMetadataDecoder decoder, bool usePipeSynchronization = false) =>
             new PipeFrameDecoder(r, decoder, usePipeSynchronization ? new SemaphoreSlim(1, 1) : default);
 
         /// <summary>
-        /// Attempt to read a frame with the specified <see cref="IMetadataDecoder"/> <see cref="decoder"/>.
+        /// Attempt to read a frame with the specified <see cref="IMetadataDecoder"/>.
         /// This method does not advance the pipe, you'll have to do it after a successful read.
         /// </summary>
         /// <param name="r">The pipe reader.</param>
-        /// <param name="decoder">The frame metadata decoder.</param>
+        /// <param name="decoder">The metadata decoder.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>The read frame on success or null.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -40,11 +58,11 @@ namespace Andromeda.Framing.Extensions
         }
 
         /// <summary>
-        /// Attempt to read a frame with the specified <see cref="IMetadataDecoder"/> <see cref="decoder"/>.
+        /// Attempt to read a frame with the specified <see cref="IMetadataDecoder"/>.
         /// This method does not advance the pipe, you'll have to do it after a successful read.
         /// </summary>
         /// <param name="r">The pipe reader.</param>
-        /// <param name="decoder">The frame metadata decoder.</param>
+        /// <param name="decoder">The metadata decoder.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>The read frame on success or null.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -58,11 +76,11 @@ namespace Andromeda.Framing.Extensions
         }
 
         /// <summary>
-        /// Attempt to read a frame with the specified <see cref="IMetadataDecoder"/> <see cref="decoder"/>.
+        /// Attempt to read a frame with the specified <see cref="IMetadataDecoder"/>.
         /// This method does not advance the pipe, you'll have to do it after a successful read.
         /// </summary>
         /// <param name="r">The pipe reader.</param>
-        /// <param name="decoder">The frame metadata decoder.</param>
+        /// <param name="decoder">The metadata decoder.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>The read frame on success or null and the relative readResult.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -97,7 +115,7 @@ namespace Andromeda.Framing.Extensions
         }
 
         /// <summary>
-        /// Attempt to read a frame with the specified <see cref="IMetadataDecoder"/> <see cref="decoder"/>.
+        /// Attempt to read a frame with the specified <see cref="IMetadataDecoder"/>.
         /// This method does not advance the pipe, you'll have to do it after a successful read.
         /// </summary>
         /// <param name="r">The pipe reader.</param>
@@ -141,15 +159,6 @@ namespace Andromeda.Framing.Extensions
             try { return await r.ReadAsync(token).ConfigureAwait(false); }
             catch (OperationCanceledException) { return CreateCompletedReadResult(token); }
             catch (InvalidOperationException) { return CreateCompletedReadResult(token); }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool TryAdvanceTo(this PipeReader r, SequencePosition consumed, SequencePosition examined)
-        {
-            // Suppress exceptions if the pipe has already been completed
-            try { r.AdvanceTo(consumed, examined); return true; }
-            catch (OperationCanceledException) { return false; }
-            catch (InvalidOperationException) { return false; }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

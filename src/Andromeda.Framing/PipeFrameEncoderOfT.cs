@@ -4,21 +4,25 @@ using System.IO;
 using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
-using Andromeda.Framing.Extensions;
 
 namespace Andromeda.Framing
 {
+    /// <inheritdoc cref="IFrameEncoder{TMetadata}"/>
     public class PipeFrameEncoder<TMeta> : PipeFrameEncoder, IFrameEncoder<TMeta> 
         where TMeta : class, IFrameMetadata
     {
+        /// <inheritdoc />
         public PipeFrameEncoder(PipeWriter pipe, IMetadataEncoder encoder, SemaphoreSlim? singleWriter = default) : base(pipe, encoder, singleWriter)
         {
         }
 
+        /// <inheritdoc />
         public PipeFrameEncoder(Stream stream, IMetadataEncoder encoder, SemaphoreSlim? singleWriter = default) : base(stream, encoder, singleWriter)
         {
         }
 
+        // TODO: fast path the write logic using the IAsyncEnumerator
+        /// <inheritdoc />
         public ValueTask WriteAsync(IAsyncEnumerable<Frame<TMeta>> frames, CancellationToken token = default)
         {
             var writer = _pipe ?? throw new ObjectDisposedException(GetType().Name);
@@ -64,6 +68,7 @@ namespace Andromeda.Framing
             }
         }
 
+        /// <inheritdoc />
         public ValueTask WriteAsync(IEnumerable<Frame<TMeta>> frames, CancellationToken token = default)
         {
             var writer = _pipe ?? throw new ObjectDisposedException(GetType().Name);
@@ -109,6 +114,7 @@ namespace Andromeda.Framing
             }
         }
 
+        /// <inheritdoc />
         public ValueTask WriteAsync(in Frame<TMeta> frame, CancellationToken token = default)
         {
             var writer = _pipe ?? throw new ObjectDisposedException(GetType().Name);

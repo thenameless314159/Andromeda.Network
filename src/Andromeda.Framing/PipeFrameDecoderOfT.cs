@@ -7,12 +7,17 @@ using System.Threading.Tasks;
 
 namespace Andromeda.Framing
 {
+    /// <inheritdoc cref="IFrameDecoder{TMetadata}"/>
     public class PipeFrameDecoder<TMeta> : PipeFrameDecoder, IFrameDecoder<TMeta>
         where TMeta : class, IFrameMetadata
     {
+        /// <inheritdoc />
         public PipeFrameDecoder(PipeReader pipe, IMetadataDecoder decoder, SemaphoreSlim? singleReader = default) : base(pipe, decoder, singleReader) { }
+
+        /// <inheritdoc />
         public PipeFrameDecoder(Stream stream, IMetadataDecoder decoder, SemaphoreSlim? singleReader = default) : base(stream, decoder, singleReader) { }
 
+        /// <inheritdoc />
         public new ValueTask<Frame<TMeta>> ReadFrameAsync(CancellationToken token = default)
         {
             static async ValueTask<Frame<TMeta>> awaitAndReturn(ValueTask<Frame> readTask) {
@@ -26,6 +31,7 @@ namespace Andromeda.Framing
                 : awaitAndReturn(readAsync);
         }
 
+        /// <inheritdoc />
         public new IAsyncEnumerable<Frame<TMeta>> ReadFramesAsync() => new FramesDecoderEnumerable(this);
 
         private sealed class FramesDecoderEnumerable : IAsyncEnumerable<Frame<TMeta>>

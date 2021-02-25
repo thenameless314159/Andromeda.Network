@@ -2,7 +2,7 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
 
-namespace Andromeda.Framing.Extensions
+namespace Andromeda.Framing
 {
     internal static class ReadOnlySequenceExtensions
     {

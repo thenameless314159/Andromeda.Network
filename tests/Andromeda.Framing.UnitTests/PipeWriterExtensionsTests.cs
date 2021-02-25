@@ -2,7 +2,6 @@
 using System.Buffers;
 using System.IO.Pipelines;
 using System.Threading.Tasks;
-using Andromeda.Framing.Extensions;
 using Xunit;
 
 namespace Andromeda.Framing.UnitTests

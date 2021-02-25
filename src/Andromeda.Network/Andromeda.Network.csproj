@@ -2,13 +2,20 @@
 
   <PropertyGroup>
 	  <Nullable>Enable</Nullable>
+	  <Version>1.0.1</Version>
+	  <FileVersion>1.0.1.0</FileVersion>
 	  <Authors>thenameless314159</Authors>
 	  <TargetFramework>net5.0</TargetFramework>
+	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <PackageIcon>andromeda_icon3.png</PackageIcon>
+	  <Copyright>Copyright 2021 thenameless314159</Copyright>
+	  <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 	  <RepositoryUrl>https://github.com/thenameless314159/Andromeda.Network</RepositoryUrl>
 	  <PackageProjectUrl>https://github.com/thenameless314159/Andromeda.Network</PackageProjectUrl>
+	  <PackageLicenseExpression></PackageLicenseExpression>
 	  <Description>.NET5 networking library based on BedrockFramework and AspNetCore sources. Provide high performance, low level networking APIs for building custom servers and clients.</Description>
-	  <PackageIcon>andromeda_icon3.png</PackageIcon>
+	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -33,6 +40,10 @@
 
 	<ItemGroup>
 	  <None Include="..\..\andromeda_icon3.png">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
+	  <None Include="..\..\LICENSE">
 	    <Pack>True</Pack>
 	    <PackagePath></PackagePath>
 	  </None>

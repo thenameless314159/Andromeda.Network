@@ -4,10 +4,10 @@ using System.IO;
 using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
-using Andromeda.Framing.Extensions;
 
 namespace Andromeda.Framing
 {
+    /// <inheritdoc />
     public class PipeFrameDecoder : IFrameDecoder
     {
         public PipeFrameDecoder(PipeReader pipe, IMetadataDecoder decoder, SemaphoreSlim? singleReader = default) =>
@@ -23,8 +23,10 @@ namespace Andromeda.Framing
         protected PipeReader? _pipe;
         private long _framesRead;
 
+        /// <inheritdoc />
         public long FramesRead => Interlocked.Read(ref _framesRead);
 
+        /// <inheritdoc />
         public ValueTask<Frame> ReadFrameAsync(CancellationToken token = default)
         {
             async ValueTask<Frame> readFrameSynchronizedAsyncSlowPath()
@@ -188,6 +190,7 @@ namespace Andromeda.Framing
             finally { _singleReader?.Release(); }
         }
 
+        /// <inheritdoc />
         public IAsyncEnumerable<Frame> ReadFramesAsync() => new FramesDecoderEnumerable(this);
 
         public virtual ValueTask DisposeAsync() { Dispose(); return default; }

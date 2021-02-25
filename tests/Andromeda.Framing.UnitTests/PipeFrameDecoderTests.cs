@@ -2,7 +2,6 @@
 using System;
 using System.IO.Pipelines;
 using System.Threading.Tasks;
-using Andromeda.Framing.Extensions;
 using Andromeda.Framing.UnitTests.Metadata;
 
 namespace Andromeda.Framing.UnitTests
