@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Pipelines;
 using System.Threading;
@@ -9,7 +8,6 @@ using Andromeda.Framing.Extensions;
 
 namespace Andromeda.Framing
 {
-    [SuppressMessage("Reliability", "CA2012", Justification = "fast paths")]
     public class PipeFrameDecoder : IFrameDecoder
     {
         public PipeFrameDecoder(PipeReader pipe, IMetadataDecoder decoder, SemaphoreSlim? singleReader = default) =>
@@ -20,8 +18,9 @@ namespace Andromeda.Framing
 
         protected readonly IMetadataDecoder _decoder;
         protected SemaphoreSlim? _singleReader;
+        protected ReadResult? _lastReadResult;
         protected Frame? _lastFrameRead;
-        protected PipeReader _pipe;
+        protected PipeReader? _pipe;
         private long _framesRead;
 
         public long FramesRead => Interlocked.Read(ref _framesRead);
@@ -31,78 +30,162 @@ namespace Andromeda.Framing
             async ValueTask<Frame> readFrameSynchronizedAsyncSlowPath()
             {
                 await _singleReader!.WaitAsync(token).ConfigureAwait(false);
-                var p = _pipe ?? throw new ObjectDisposedException(GetType().Name);
-
+                var r = true;
                 try
                 {
-                    var last = _lastFrameRead;
-                    if (last.HasValue) p.AdvanceTo(last.Value.Payload.End);
+                    if (!TryAdvanceToNextFrame()) throw new ObjectDisposedException(GetType().Name);
+                    if (_lastFrameRead.HasValue) { r = false; var f = _lastFrameRead.Value;
+                        return await CompleteReadAsync(f, token).ConfigureAwait(false);
+                    }
+
+                    Frame? frame = default;
                     while (!token.IsCancellationRequested)
                     {
-                        var readFrame = p.ReadFrameAsync(_decoder, token);
-                        var result = !readFrame.IsCompletedSuccessfully 
+                        var readFrame = _pipe?.ReadFrameWithResultAsync(_decoder, token)
+                                        ?? throw new ObjectDisposedException(GetType().Name);
+
+                        var (f, readResult) = !readFrame.IsCompletedSuccessfully
                             ? await readFrame.ConfigureAwait(false)
                             : readFrame.Result;
 
-                        if (!Release(in result)) continue;
-                        return result!.Value;
+                        if (Release(in f, in readResult)) { frame = f;
+                            break;
+                        }
+
+                        // advance if the readResult is not completed and we couldn't read a frame
+                        if (readResult.IsCompleted || !TryAdvanceToNextFrame()) break;
+                        if (!_lastFrameRead.HasValue) continue;
+
+                        // complete the read if we couldn't release but a frame was still parsed
+                        r = false; var lf = _lastFrameRead!.Value;
+                        return await CompleteReadAsync(lf, token).ConfigureAwait(false);
                     }
+                    return frame ?? Frame.Empty;
                 }
-                finally { _singleReader!.Release(); }
-                return Frame.Empty;
+                finally { if(r) _singleReader!.Release(); }
             }
-            async ValueTask<Frame> continueReadAsync(ValueTask<Frame?> readTask, PipeReader r)
+            async ValueTask<Frame> continueReadAsync(ValueTask<(Frame? Frame, ReadResult ReadResult)> readTask)
             {
+                var r = true;
                 try
                 {
-                    var frameRead = await readTask.ConfigureAwait(false);
-                    if (frameRead.HasValue && Release(in frameRead)) 
-                        return frameRead.Value;
+                    var (f, readResult) = await readTask.ConfigureAwait(false);
+                    if (f.HasValue && Release(in f, in readResult)) 
+                        return f.Value;
 
+                    Frame? frame = default;
                     while (!token.IsCancellationRequested)
                     {
-                        var readFrame = r.ReadFrameAsync(_decoder, token);
-                        var result = !readFrame.IsCompletedSuccessfully
+                        var readFrame = _pipe?.ReadFrameWithResultAsync(_decoder, token) 
+                                         ?? throw new ObjectDisposedException(GetType().Name);
+
+                        (f, readResult) = !readFrame.IsCompletedSuccessfully
                             ? await readFrame.ConfigureAwait(false)
                             : readFrame.Result;
 
-                        if (!Release(in result)) continue;
-                        return result!.Value;
+                        if (Release(in f, in readResult)) { frame = f; 
+                            break;
+                        }
+
+                        // advance if the readResult is not completed and we couldn't read a frame
+                        if (readResult.IsCompleted || !TryAdvanceToNextFrame()) break;
+                        if (!_lastFrameRead.HasValue) continue;
+
+                        // complete the read if we couldn't release but a frame was still parsed
+                        r = false; var lf = _lastFrameRead!.Value;
+                        return await CompleteReadAsync(lf, token).ConfigureAwait(false);
                     }
+                    
+                    return frame ?? Frame.Empty;
                 }
-                finally { _singleReader?.Release(); }
-                return Frame.Empty;
+                finally { if(r) _singleReader?.Release(); }
+                
             }
 
             // try to get the conch; if not, switch to async
             if (_singleReader is not null && !_singleReader.Wait(0, token))
                 return readFrameSynchronizedAsyncSlowPath();
 
-            var pipe = _pipe ?? throw new ObjectDisposedException(GetType().Name);
             var release = true;
-
             try
             {
-                // If a frame is present it means a read has already been performed by this instance
-                // therefore the pipe need to be advanced before reading a new frame.
-                ref var lastFrame = ref _lastFrameRead;
-                if(lastFrame.HasValue) pipe.AdvanceTo(lastFrame.Value.Payload.End);
+                if(!TryAdvanceToNextFrame()) throw new ObjectDisposedException(GetType().Name);
 
+                ref var lastFrame = ref _lastFrameRead;
+                if (lastFrame.HasValue) { release = false; var f = lastFrame.Value; 
+                    return CompleteReadAsync(in f, token);
+                }
+
+                Frame? frame = default;
                 while (!token.IsCancellationRequested)
                 {
-                    var readFrameAsync = pipe.ReadFrameAsync(_decoder, token);
+                    var readFrameAsync = _pipe?.ReadFrameWithResultAsync(_decoder, token)
+                                         ?? throw new ObjectDisposedException(GetType().Name);
+
                     if (!readFrameAsync.IsCompletedSuccessfully) { release = false;
-                        return continueReadAsync(readFrameAsync, pipe);
+                        return continueReadAsync(readFrameAsync);
                     }
 
-                    var result = readFrameAsync.Result;
-                    if (!Release(in result)) continue;
-                    return ValueTask.FromResult(result!.Value);
+                    var (f, readResult) = readFrameAsync.Result;
+                    if (Release(in f, in readResult)) { frame = f;
+                        break;
+                    }
+
+                    // advance if the readResult is not completed and we couldn't read a frame
+                    if (readResult.IsCompleted || !TryAdvanceToNextFrame()) 
+                        throw new ObjectDisposedException(GetType().Name);
+
+                    lastFrame = ref _lastFrameRead;
+                    if (!lastFrame.HasValue) continue;
+
+                    // complete the read if we couldn't release but a frame was still parsed
+                    release = false; var lf = lastFrame!.Value;
+                    return CompleteReadAsync(in lf, token);
                 }
+                return ValueTask.FromResult(frame ?? Frame.Empty);
             }
             // don't release if we had to continue with an async path
             finally { if(release) _singleReader?.Release(); }
-            return ValueTask.FromResult(Frame.Empty);
+        }
+
+        private ValueTask<Frame> CompleteReadAsync(in Frame frame, CancellationToken token = default)
+        {
+            async ValueTask<Frame> completeReadAsyncSlow(ValueTask<ReadResult> read)
+            {
+                try
+                {
+                    var result = await read.ConfigureAwait(false);
+                    var f = _lastFrameRead ?? throw new InvalidOperationException();
+                    if (result.Buffer.Length < f.Metadata.Length)
+                        throw new InvalidOperationException();
+
+                    var p = result.Buffer.Slice(0, f.Metadata.Length);
+                    f = new Frame(p, f.Metadata);
+                    _lastFrameRead = f;
+                    return f;
+                }
+                finally { _singleReader?.Release(); }
+            }
+
+            try
+            {
+                var r = _pipe?.TryReadAsync(token)
+                        ?? throw new ObjectDisposedException(GetType().Name);
+
+                if (!r.IsCompletedSuccessfully) return completeReadAsyncSlow(r);
+                var result = r.Result;
+                if (result.Buffer.Length < frame.Metadata.Length)
+                    throw new InvalidOperationException(
+                        "Couldn't parse remaining payload of frame with " +
+                        $"{frame.Metadata}, readBytes: {result.Buffer.Length}");
+
+                var payload = result.Buffer.Slice(0, frame.Metadata.Length);
+                var frameWithPayload = new Frame(payload, frame.Metadata);
+                _lastFrameRead = frameWithPayload;
+
+                return ValueTask.FromResult(frameWithPayload);
+            }
+            finally { _singleReader?.Release(); }
         }
 
         public IAsyncEnumerable<Frame> ReadFramesAsync() => new FramesDecoderEnumerable(this);
@@ -114,21 +197,63 @@ namespace Andromeda.Framing
         public virtual void Dispose()
         {
             var semaphore = Interlocked.Exchange(ref _singleReader, null);
-            var pipe = Interlocked.Exchange(ref _pipe, null!);
+            var pipe = Interlocked.Exchange(ref _pipe, null);
             pipe?.CancelPendingRead();
             semaphore?.Dispose();
 
             GC.SuppressFinalize(this);
         }
 
-        protected bool Release(in Frame? frameRead)
+        protected bool TryAdvanceToNextFrame()
         {
-            if (!frameRead.HasValue) return false;
+            // If a frame is present it means a read has already been performed by this instance
+            // therefore the pipe need to be advanced before reading a new frame.
+            ref var lastReadResult = ref _lastReadResult;
+            ref var lastFrame = ref _lastFrameRead;
+            bool couldAdvance;
 
-            // If the access to the pipe is already synchronized, increment using Interlocked class
+            // Advance if we couldn't parse any frame but still have read something
+            if (!lastFrame.HasValue && lastReadResult.HasValue) {
+                couldAdvance = _pipe?.TryAdvanceTo(lastReadResult.Value.Buffer.Start) ?? false;
+                lastReadResult = default;
+                return couldAdvance;
+            }
+
+            // Advance after the already consumed metadata if a frame with an incomplete payload was read
+            if (lastFrame.HasValue && lastReadResult.HasValue && 
+                lastFrame.Value.Payload.Length != lastFrame.Value.Metadata.Length)
+            {
+                couldAdvance = _pipe?.TryAdvanceTo(lastReadResult.Value.Buffer
+                    .GetPosition(_decoder.GetMetadataLength(lastFrame.Value.Metadata), 
+                        lastReadResult.Value.Buffer.Start)) ?? false;
+
+                return couldAdvance;
+            }
+
+            couldAdvance = !lastFrame.HasValue || (_pipe?.TryAdvanceTo(lastFrame.Value.Payload.End) ?? false);
+            lastReadResult = default;
+            lastFrame = default;
+            return couldAdvance;
+        }
+
+        protected bool Release(in Frame? frame, in ReadResult readResult)
+        {
+            if (!frame.HasValue) {
+                _lastReadResult = readResult;
+                _lastFrameRead = default;
+                return false;
+            }
+
+            if (frame.Value.Payload.Length != frame.Value.Metadata.Length) {
+                _lastReadResult = readResult;
+                _lastFrameRead = frame.Value;
+                return false;
+            }
+
+            // If the access to the pipe is not synchronized, increment using Interlocked class
             if (_singleReader is not null) _framesRead++;
             else Interlocked.Increment(ref _framesRead);
-            _lastFrameRead = frameRead;
+            _lastFrameRead = frame;
             _singleReader?.Release();
             return true;
         }
@@ -149,27 +274,24 @@ namespace Andromeda.Framing
             private readonly PipeFrameDecoder _decoder;
             private readonly CancellationToken _token;
 
-            public Frame Current { get; private set; }
+            public Frame Current => _decoder._lastFrameRead.GetValueOrDefault();
 
-            // Maybe should dispose decoder here ? 
             public ValueTask DisposeAsync() => default;
 
-            public ValueTask<bool> MoveNextAsync()
+            public async ValueTask<bool> MoveNextAsync()
             {
-                async ValueTask<bool> moveNextAsync(ValueTask<Frame> readAsync) 
+                try 
                 {
-                    Current = await readAsync.ConfigureAwait(false);
-                    return true;
+                    var readFrameAsync = _decoder.ReadFrameAsync(_token);
+                    if (readFrameAsync.IsCompleted) 
+                        return readFrameAsync.IsCompletedSuccessfully 
+                               && readFrameAsync.Result.Metadata != null!;
+
+                    await readFrameAsync.ConfigureAwait(false);
                 }
-                if (_token.IsCancellationRequested)
-                    return ValueTask.FromResult(false);
-
-                var readFrameAsync = _decoder.ReadFrameAsync(_token);
-                if (readFrameAsync.IsCompletedSuccessfully)
-                    return moveNextAsync(readFrameAsync);
-
-                Current = readFrameAsync.Result;
-                return ValueTask.FromResult(true);
+                catch (OperationCanceledException) { return false; }
+                catch (ObjectDisposedException) { return false; }
+                return false;
             }
         }
     }

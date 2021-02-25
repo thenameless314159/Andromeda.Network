@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Linq;
+using Andromeda.Framing.UnitTests.Metadata;
 
 namespace Andromeda.Framing.UnitTests.Helpers
 {
@@ -31,6 +32,16 @@ namespace Andromeda.Framing.UnitTests.Helpers
             BinaryPrimitives.WriteInt32BigEndian(buffer.Span[2..], length);
             if (length > 0) random.NextBytes(buffer.Span[6..]);
             return buffer;
+        }
+
+        // return readonly struct by ref with out
+        public static bool TryGetFrameWithRandomPayload(IdPrefixedMetadata meta, out Frame frame, Random? random = default)
+        {
+            random ??= new Random();
+            Memory<byte> buffer = new byte[meta.Length];
+            if (meta.Length > 0) random.NextBytes(buffer.Span);
+            frame = new Frame(buffer, meta);
+            return true;
         }
 
         public static ReadOnlySequence<byte> GetMultiplesRandomFramesAsSequence(int messageId, params int[] framesLength) => new(GetMultiplesRandomFramesAsBuffer(messageId, framesLength));

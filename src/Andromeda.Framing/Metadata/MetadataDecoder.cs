@@ -5,6 +5,7 @@ namespace Andromeda.Framing
     public abstract class MetadataDecoder<TMetadata> : IMetadataDecoder where TMetadata : class, IFrameMetadata
     {
         protected abstract bool TryParse(ref SequenceReader<byte> input, out TMetadata? metadata);
+        protected abstract int GetMetadataLength(TMetadata metadata);
 
         public bool TryParse(ref SequenceReader<byte> input, out IFrameMetadata? metadata)
         {
@@ -17,5 +18,7 @@ namespace Andromeda.Framing
             metadata = meta;
             return true;
         }
+
+        public int GetMetadataLength(IFrameMetadata metadata) => GetMetadataLength((TMetadata) metadata);
     }
 }

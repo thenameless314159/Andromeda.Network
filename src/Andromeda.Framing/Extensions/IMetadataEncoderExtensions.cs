@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Buffers;
+using System.Runtime.CompilerServices;
 
 namespace Andromeda.Framing
 {
     public static class IMetadataEncoderExtensions
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryWriteMetadata(this IMetadataEncoder encoder, IBufferWriter<byte> writer, IFrameMetadata metadata)
         {
             var metaLength = encoder.GetLength(metadata);

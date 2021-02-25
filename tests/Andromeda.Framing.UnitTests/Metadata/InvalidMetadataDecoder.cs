@@ -9,5 +9,7 @@ namespace Andromeda.Framing.UnitTests.Metadata
             metadata = new DefaultFrameMetadata(-1);
             return true;
         }
+
+        public int GetMetadataLength(IFrameMetadata metadata) => 0;
     }
 }

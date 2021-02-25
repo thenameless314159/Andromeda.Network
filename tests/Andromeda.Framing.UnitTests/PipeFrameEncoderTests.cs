@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO.Pipelines;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Andromeda.Framing.Extensions;
 using Andromeda.Framing.UnitTests.Metadata;
@@ -12,12 +11,12 @@ namespace Andromeda.Framing.UnitTests
     public class PipeFrameEncoderTests
     {
         private readonly IMetadataParser _parser = new IdPrefixedMetadataParser();
-        private static (IFrameEncoder, Pipe) CreateEncoder(IMetadataEncoder encoder) { var pipe = new Pipe();
+        protected virtual (IFrameEncoder, Pipe) CreateEncoder(IMetadataEncoder encoder) { var pipe = new Pipe();
             return (pipe.Writer.AsFrameEncoder(encoder), pipe);
         }
 
         [Fact]
-        public async Task ShouldThrow_WhenDecoderHasDisposed()
+        public async Task ShouldThrow_WhenEncoderHasBeenDisposed()
         {
             static async Task writeEmptyAsync(IFrameEncoder encoder)
             {
@@ -31,6 +30,20 @@ namespace Andromeda.Framing.UnitTests
             var (encoder, _) = CreateEncoder(_parser); encoder.Dispose();
             await writeEmptyAsync(encoder).ConfigureAwait(false);
         }
+
+        [Fact]
+        public async Task ShouldReturn_WhenPipeHasAlreadyBeenCompleted()
+        {
+            static async Task writeEmptyAsync(IFrameEncoder encoder)
+            {
+                await encoder.WriteAsync(Frame.Empty);
+                await encoder.WriteAsync(Array.Empty<Frame>());
+                await encoder.WriteAsync(AsyncEnumerable.Empty<Frame>());
+            }
+            var (encoder, pipe) = CreateEncoder(_parser); pipe.Writer.Complete();
+            await writeEmptyAsync(encoder).ConfigureAwait(false);
+        }
+
 
         [Fact]
         public async Task ShouldThrow_WhenPipeIsNull()
@@ -49,24 +62,11 @@ namespace Andromeda.Framing.UnitTests
         }
 
         [Fact]
-        public async Task ShouldThrow_WhenEncoderReturnInvalidLength()
+        public async Task ShouldThrow_WhenEncoderReturnInvalidMetadataLength()
         {
             var (encoder, _) = CreateEncoder(new InvalidMetadataEncoder());
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 { await encoder.WriteAsync(Frame.Empty); }).ConfigureAwait(false);
-        }
-
-        [Fact]
-        public async Task ShouldReturn_WhenPipeHasAlreadyBeenCompleted()
-        {
-            static async Task writeEmptyAsync(IFrameEncoder encoder)
-            {
-                await encoder.WriteAsync(Frame.Empty);
-                await encoder.WriteAsync(Array.Empty<Frame>());
-                await encoder.WriteAsync(AsyncEnumerable.Empty<Frame>());
-            }
-            var (encoder, pipe) = CreateEncoder(_parser); pipe.Writer.Complete();
-            await writeEmptyAsync(encoder).ConfigureAwait(false);
         }
     }
 }

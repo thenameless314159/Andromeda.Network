@@ -17,8 +17,12 @@ namespace Andromeda.Framing
             return true;
         }
 
+        
+
         public void Write(ref Span<byte> span, IFrameMetadata metadata) => Write(ref span, (TMetadata)metadata);
         public int GetLength(IFrameMetadata metadata) => GetLength((TMetadata)metadata);
+        public int GetMetadataLength(IFrameMetadata metadata) => GetLength(metadata);
+        
 
         protected abstract bool TryParse(ref SequenceReader<byte> input, out TMetadata? metadata);
         protected abstract void Write(ref Span<byte> span, TMetadata metadata);

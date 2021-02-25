@@ -15,6 +15,7 @@ namespace Andromeda.Framing
             .TryParse(ref input, out metadata);
 
         public int GetLength(IFrameMetadata metadata) => _encoder.GetLength(metadata);
+        public int GetMetadataLength(IFrameMetadata metadata) => _decoder.GetMetadataLength(metadata);
         public void Write(ref Span<byte> span, IFrameMetadata metadata) => _encoder.Write(ref span, metadata);
     }
 }

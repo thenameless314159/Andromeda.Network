@@ -14,6 +14,8 @@ namespace Andromeda.Framing
 
         public ReadOnlySequence<byte> Payload { get; }
         public IFrameMetadata Metadata { get; }
+
+        public bool IsEmpty() => Metadata != null! && Metadata.Length == 0 && Payload.IsEmpty;
     }
 
     public readonly struct Frame<TMetadata> where TMetadata : class, IFrameMetadata
@@ -28,5 +30,7 @@ namespace Andromeda.Framing
 
         public ReadOnlySequence<byte> Payload { get; }
         public TMetadata Metadata { get; }
+
+        public bool IsEmpty() => Metadata == null! || Metadata.Length == 0 && Payload.IsEmpty;
     }
 }
