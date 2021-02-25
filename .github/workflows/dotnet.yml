@@ -23,6 +23,10 @@ jobs:
     - name: dotnet pack
       run: dotnet pack Andromeda.Network.sln -c Release --no-build --output .
 
-    - name: push packages
+    - name: push network
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+      run: dotnet nuget push Andromeda.Network.*.*.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+    
+    - name: push framing
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      run: dotnet nuget push Andromeda.Network.Framing.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
