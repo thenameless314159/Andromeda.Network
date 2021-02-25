@@ -10,7 +10,7 @@
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	  <PackageIcon>andromeda_icon3.png</PackageIcon>
 	  <Copyright>Copyright 2021 thenameless314159</Copyright>
-	  <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	  <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	  <RepositoryUrl>https://github.com/thenameless314159/Andromeda.Network</RepositoryUrl>
 	  <PackageProjectUrl>https://github.com/thenameless314159/Andromeda.Network</PackageProjectUrl>
 	  <PackageLicenseExpression></PackageLicenseExpression>
