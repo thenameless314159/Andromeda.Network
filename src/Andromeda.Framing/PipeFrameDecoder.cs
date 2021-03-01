@@ -56,7 +56,7 @@ namespace Andromeda.Framing
             var reader = _pipe ?? throw new ObjectDisposedException(GetType().Name);
 
             try {
-                for (var attempt = 0; /* true */; attempt++)
+                for (var attempt = 1; /* true */; attempt++)
                 {
                     var readResult = await reader.ReadAsync(token).ConfigureAwait(false);
                     if (TryReadFrame(in readResult, out _frame)) return _frame;
@@ -76,9 +76,10 @@ namespace Andromeda.Framing
             if (_isCanceled) return false;
             var buffer = readResult.Buffer;
             _nextFrame = buffer.Start;
+            _hasAdvanced = false; 
 
             if (buffer.TryParseFrame(_decoder, out frame)) { 
-                _nextFrame = frame.Payload.End; _hasAdvanced = false; _framesRead++;
+                _nextFrame = frame.Payload.End; _framesRead++;
                 // If the payload is empty there's no need for the reader to hold on to the bytes.
                 return !frame.IsPayloadEmpty() || TryAdvanceToNextFrame();
             }
@@ -117,6 +118,5 @@ namespace Andromeda.Framing
             pipe.CancelPendingRead();
             GC.SuppressFinalize(this);
         }
-
     }
 }
