@@ -53,9 +53,11 @@ namespace Andromeda.Framing
             in Frame frame, CancellationToken token = default) => !encoder.TryWriteMetadata(writer, frame.Metadata) 
                 // Returns a completed flushResult in case we couldn't write the metadata
                 ? ValueTask.FromResult(new FlushResult(token.IsCancellationRequested, true)) 
-                : !frame.Payload.IsSingleSegment
-                    ? writer.WriteMultiSegmentSequenceAsync(frame.Payload, token)
-                    : writer.WriteMemoryAsync(frame.Payload.First, token);
+                : frame.IsPayloadEmpty() 
+                    ? writer.FlushAsync(token)
+                    : !frame.Payload.IsSingleSegment
+                        ? writer.WriteMultiSegmentSequenceAsync(frame.Payload, token)
+                        : writer.WriteMemoryAsync(frame.Payload.First, token);
 
         /// <summary>
         /// Write a <see cref="Frame{TMetadata}"/> in the current writer using the specified <see cref="IMetadataEncoder"/>.
@@ -72,9 +74,11 @@ namespace Andromeda.Framing
             if (!encoder.TryWriteMetadata(writer, frame.Metadata))
                 return ValueTask.FromResult(new FlushResult(token.IsCancellationRequested, true));
 
-            return !frame.Payload.IsSingleSegment
-                ? writer.WriteMultiSegmentSequenceAsync(frame.Payload, token)
-                : writer.WriteMemoryAsync(frame.Payload.First, token);
+            return frame.IsPayloadEmpty()
+                ? writer.FlushAsync(token)
+                : !frame.Payload.IsSingleSegment
+                    ? writer.WriteMultiSegmentSequenceAsync(frame.Payload, token)
+                    : writer.WriteMemoryAsync(frame.Payload.First, token);
         }
 
         /// <summary>

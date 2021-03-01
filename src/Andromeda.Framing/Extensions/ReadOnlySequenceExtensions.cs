@@ -20,7 +20,7 @@ namespace Andromeda.Framing
 
             if (reader.Remaining < metadata.Length) return false;
 
-            frame = new Frame(buffer.Slice(reader.Consumed, metadata.Length), metadata);
+            frame = new Frame(buffer.Slice(reader.Position, metadata.Length), metadata);
             return true;
         }
     }
