@@ -15,18 +15,18 @@ jobs:
         dotnet-version: 5.0.x
 
     - name: dotnet build
-      run: dotnet build Andromeda.Network.sln -c Release
+      run: dotnet build Andromeda.Serialization.sln -c Release
       
     - name: dotnet test
-      run: dotnet test Andromeda.Network.sln -c Release --no-build
+      run: dotnet test Andromeda.Serialization.sln -c Release --no-build
 
     - name: dotnet pack
-      run: dotnet pack Andromeda.Network.sln -c Release --no-build --output .
+      run: dotnet pack Andromeda.Serialization.sln -c Release --no-build --output .
 
-    - name: push network
+    - name: push serialization
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      run: dotnet nuget push Andromeda.Network.*.*.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+      run: dotnet nuget push Andromeda.Serialization.*.*.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
     
-    - name: push framing
+    - name: push extensions
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      run: dotnet nuget push Andromeda.Network.Framing.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+      run: dotnet nuget push Andromeda..Serialization.Extensions.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate

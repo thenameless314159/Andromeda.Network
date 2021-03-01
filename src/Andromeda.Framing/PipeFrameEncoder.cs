@@ -26,56 +26,51 @@ namespace Andromeda.Framing
 
         protected readonly IMetadataEncoder _encoder;
         protected SemaphoreSlim? _singleWriter;
+        protected PipeWriter? _pipe;
         private long _framesWritten;
-        protected PipeWriter _pipe;
-
+        
         /// <inheritdoc />
         public long FramesWritten => Interlocked.Read(ref _framesWritten);
 
-        // TODO: fast path the write logic using the IAsyncEnumerator
         /// <inheritdoc />
         public ValueTask WriteAsync(IAsyncEnumerable<Frame> frames, CancellationToken token = default)
         {
             var writer = _pipe ?? throw new ObjectDisposedException(GetType().Name);
-
+            
             // try to get the conch; if not, switch to async
-            if (_singleWriter is not null && !_singleWriter.Wait(0, token))
-                return sendAllSlow();
-
-            return sendAll();
-
+            return TryWaitForSingleWriter(token) ? sendAll() : sendAllSlow();
             async ValueTask sendAll()
             {
-                try
-                {
+                var framesWritten = 0;
+                try {
                     await foreach (var frame in frames.WithCancellation(token))
                     {
                         var writeAsync = writer.WriteFrameAsync(_encoder, in frame, token);
                         var flushResult = writeAsync.IsCompletedSuccessfully ? writeAsync.Result
                             : await writeAsync.ConfigureAwait(false);
 
-                        if (flushResult.IsCanceled || flushResult.IsCompleted)
-                            break;
+                        framesWritten++;
+                        if (flushResult.IsCanceled || flushResult.IsCompleted) break;
                     }
                 }
-                finally { Release(); }
+                finally { Release(framesWritten); }
             }
             async ValueTask sendAllSlow()
             {
-                await _singleWriter.WaitAsync(token).ConfigureAwait(false);
-                try
-                {
+                await WaitForSingleWriterAsync(token).ConfigureAwait(false);
+                var framesWritten = 0;
+                try {
                     await foreach (var frame in frames.WithCancellation(token))
                     {
                         var writeAsync = writer.WriteFrameAsync(_encoder, in frame, token);
                         var flushResult = writeAsync.IsCompletedSuccessfully ? writeAsync.Result
                             : await writeAsync.ConfigureAwait(false);
 
-                        if (flushResult.IsCanceled || flushResult.IsCompleted)
-                            break;
+                        framesWritten++;
+                        if (flushResult.IsCanceled || flushResult.IsCompleted) break;
                     }
                 }
-                finally { Release(); }
+                finally { Release(framesWritten); }
             }
         }
 
@@ -85,43 +80,39 @@ namespace Andromeda.Framing
             var writer = _pipe ?? throw new ObjectDisposedException(GetType().Name);
 
             // try to get the conch; if not, switch to async
-            if (_singleWriter is not null && !_singleWriter.Wait(0, token))
-                return sendAllSlow();
-
-            return sendAll();
-
+            return TryWaitForSingleWriter(token) ? sendAll() : sendAllSlow();
             async ValueTask sendAll()
             {
-                try
-                {
+                var framesWritten = 0;
+                try {
                     foreach (var frame in frames)
                     {
                         var writeAsync = writer.WriteFrameAsync(_encoder, in frame, token);
                         var flushResult = writeAsync.IsCompletedSuccessfully ? writeAsync.Result
                             : await writeAsync.ConfigureAwait(false);
 
-                        if (flushResult.IsCanceled || flushResult.IsCompleted)
-                            break;
+                        framesWritten++;
+                        if (flushResult.IsCanceled || flushResult.IsCompleted) break;
                     }
                 }
-                finally { Release(); }
+                finally { Release(framesWritten); }
             }
             async ValueTask sendAllSlow()
             {
-                await _singleWriter.WaitAsync(token).ConfigureAwait(false);
-                try
-                {
+                await WaitForSingleWriterAsync(token).ConfigureAwait(false);
+                var framesWritten = 0;
+                try {
                     foreach (var frame in frames)
                     {
                         var writeAsync = writer.WriteFrameAsync(_encoder, in frame, token);
                         var flushResult = writeAsync.IsCompletedSuccessfully ? writeAsync.Result
                             : await writeAsync.ConfigureAwait(false);
 
-                        if (flushResult.IsCanceled || flushResult.IsCompleted)
-                            break;
+                        framesWritten++;
+                        if (flushResult.IsCanceled || flushResult.IsCompleted) break;
                     }
                 }
-                finally { Release(); }
+                finally { Release(framesWritten); }
             }
         }
 
@@ -131,37 +122,51 @@ namespace Andromeda.Framing
             var writer = _pipe ?? throw new ObjectDisposedException(GetType().Name);
 
             // try to get the conch; if not, switch to async
-            if (_singleWriter is not null && !_singleWriter.Wait(0, token))
-                return sendAsyncSlowPath(frame);
+            if (!TryWaitForSingleWriter(token)) return sendAsyncSlowPath(frame);
 
             var release = true;
-            try
-            {
+            try {
                 var write = writer.WriteFrameAsync(_encoder, in frame, token); // includes a flush
-                if (!write.IsCompletedSuccessfully) release = false;
+                if (write.IsCompletedSuccessfully) return default;
 
-                return write.IsCompletedSuccessfully ? default : awaitFlushAndRelease(write);
+                release = false; return awaitFlushAndRelease(write);
             }
-            finally { if(release) Release(); } // don't release if we had to continue with an async path
-            async ValueTask awaitFlushAndRelease(ValueTask<FlushResult> flush) { try { await flush; } finally { Release(); } }
-            async ValueTask sendAsyncSlowPath(Frame frm) { await _singleWriter.WaitAsync(token).ConfigureAwait(false);
-                try { await writer.WriteFrameAsync(_encoder, frm, token).ConfigureAwait(false); } finally { Release(); }
+            finally { if(release) Release(); } // don't release here if we had to continue with an async path
+            async ValueTask awaitFlushAndRelease(ValueTask<FlushResult> flush) 
+            { try { await flush.ConfigureAwait(false); } finally { Release(); } }
+            async ValueTask sendAsyncSlowPath(Frame frm) 
+            { 
+                await WaitForSingleWriterAsync(token).ConfigureAwait(false);
+                try {
+                    var writeAsync = writer.WriteFrameAsync(_encoder, in frm, token);
+                    if (!writeAsync.IsCompletedSuccessfully) await writeAsync.ConfigureAwait(false);
+                }
+                finally { Release(); }
             }
         }
         
         public ValueTask DisposeAsync() { Dispose(); return default; }
 
-        // Should we also complete the pipe ? I don't know since this should be done by the transport
-        // that own the pipe, but this is not within the scope of this library so maybe we should...
         public virtual void Dispose()
         {
             var semaphore = Interlocked.Exchange(ref _singleWriter, null);
             var pipe = Interlocked.Exchange(ref _pipe, null!);
-            pipe?.CancelPendingFlush();
-            semaphore?.Dispose();
-
+            
+            // Should we also complete the pipe ? I don't know since this should be done by the transport
+            // that own the pipe, but this is not within the scope of this library so maybe we should...
+            try { pipe?.CancelPendingFlush(); }
+            catch { /* discard all exceptions at this point */}
+            finally { semaphore?.Dispose(); }
             GC.SuppressFinalize(this);
         }
+
+        protected virtual Task WaitForSingleWriterAsync(CancellationToken token = default) =>
+            _singleWriter is not null 
+                ? _singleWriter.WaitAsync(token) 
+                : Task.CompletedTask;
+
+        protected bool TryWaitForSingleWriter(CancellationToken token = default) =>
+            _singleWriter is null || _singleWriter.Wait(0, token);
 
         protected void Release(int framesWritten = 1)
         {
