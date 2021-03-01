@@ -239,7 +239,7 @@ namespace Andromeda.Framing
             return couldAdvance;
         }
 
-        protected bool Release(in Frame? frame, in ReadResult readResult)
+        protected virtual bool Release(in Frame? frame, in ReadResult readResult)
         {
             if (!frame.HasValue) {
                 _lastReadResult = readResult;
@@ -286,9 +286,9 @@ namespace Andromeda.Framing
                 try 
                 {
                     var readFrameAsync = _decoder.ReadFrameAsync(_token);
-                    if (readFrameAsync.IsCompleted) 
-                        return readFrameAsync.IsCompletedSuccessfully 
-                               && readFrameAsync.Result.Metadata != null!;
+                    if (readFrameAsync.IsCompleted) return 
+                        readFrameAsync.IsCompletedSuccessfully
+                        && readFrameAsync.Result.Metadata != null!;
 
                     await readFrameAsync.ConfigureAwait(false);
                 }
