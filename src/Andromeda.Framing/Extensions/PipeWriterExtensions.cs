@@ -53,7 +53,9 @@ namespace Andromeda.Framing
             in Frame frame, CancellationToken token = default) => !encoder.TryWriteMetadata(writer, frame.Metadata) 
                 // Returns a completed flushResult in case we couldn't write the metadata
                 ? ValueTask.FromResult(new FlushResult(token.IsCancellationRequested, true)) 
-                : writer.WriteFramePayloadAsync(in frame, token);
+                : !frame.Payload.IsSingleSegment
+                    ? writer.WriteMultiSegmentSequenceAsync(frame.Payload, token)
+                    : writer.WriteMemoryAsync(frame.Payload.First, token);
 
         /// <summary>
         /// Write a <see cref="Frame{TMetadata}"/> in the current writer using the specified <see cref="IMetadataEncoder"/>.
@@ -70,19 +72,10 @@ namespace Andromeda.Framing
             if (!encoder.TryWriteMetadata(writer, frame.Metadata))
                 return ValueTask.FromResult(new FlushResult(token.IsCancellationRequested, true));
 
-            var untyped = frame.AsUntyped();
-            return writer.WriteFramePayloadAsync(in untyped, token);
+            return !frame.Payload.IsSingleSegment
+                ? writer.WriteMultiSegmentSequenceAsync(frame.Payload, token)
+                : writer.WriteMemoryAsync(frame.Payload.First, token);
         }
-
-        /// <summary>
-        /// Write the payload of the <see cref="Frame"/> in the current writer.
-        /// </summary>
-        /// <param name="writer">The pipe writer.</param>
-        /// <param name="frame">The frame to write.</param>
-        /// <param name="token">The cancellation token.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ValueTask<FlushResult> WriteFramePayloadAsync(this PipeWriter writer, in Frame frame, 
-            CancellationToken token = default) => writer.WriteSequenceAsync(frame.Payload, token);
 
         /// <summary>
         /// Write a buffer in the current writer.
@@ -96,22 +89,16 @@ namespace Andromeda.Framing
         public static ValueTask<FlushResult> WriteSequenceAsync(this PipeWriter writer, ReadOnlySequence<byte> buffer,
             CancellationToken token = default) => !buffer.IsSingleSegment
             ? writer.WriteMultiSegmentSequenceAsync(buffer, token)
-            : writer.WriteMemoryAsync(buffer.First, token) ;
+            : writer.WriteMemoryAsync(buffer.First, token);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static async ValueTask<FlushResult> WriteMultiSegmentSequenceAsync(this PipeWriter writer, ReadOnlySequence<byte> buffer,
+        internal static ValueTask<FlushResult> WriteMultiSegmentSequenceAsync(this PipeWriter writer, ReadOnlySequence<byte> buffer,
             CancellationToken token = default)
         {
-            FlushResult flushResult = default;
             foreach (var segment in buffer)
-            {
-                var writeAsync = writer.WriteMemoryAsync(segment, token);
-                flushResult = writeAsync.IsCompletedSuccessfully ? writeAsync.Result
-                    : await writeAsync.ConfigureAwait(false);
+                writer.WriteBigMemory(segment);
 
-                if (flushResult.IsCanceled || flushResult.IsCompleted) return flushResult;
-            }
-            return flushResult;
+            return writer.FlushAsync(token);
         }
 
         /// <summary>
@@ -129,23 +116,27 @@ namespace Andromeda.Framing
             return buffer.Length < chunkSize ? writer.WriteAsync(buffer, token) : writeBigMemoryAsync();
             ValueTask<FlushResult> writeBigMemoryAsync()
             {
-                var i = 0;
-                for (var c = buffer.Length / chunkSize; i < c; i++) // write by blocks of 8192 bytes
-                {
-                    var memory = writer.GetMemory(chunkSize);
-                    buffer.Slice(i * chunkSize, chunkSize).CopyTo(memory);
-                    writer.Advance(chunkSize);
-                }
-
-                var remaining = buffer.Length % chunkSize;
-                if (remaining == 0) return writer.FlushAsync(token);
-
-                var mem = writer.GetMemory(remaining);
-                buffer[^remaining..].CopyTo(mem);
-                writer.Advance(remaining);
-
+                writer.WriteBigMemory(buffer);
                 return writer.FlushAsync(token);
             }
+        }
+
+        private static void WriteBigMemory(this IBufferWriter<byte> writer, ReadOnlyMemory<byte> buffer)
+        {
+            var i = 0; const int chunkSize = 1024 * 8;
+            for (var c = buffer.Length / chunkSize; i < c; i++) // write by blocks of 8192 bytes
+            {
+                var memory = writer.GetMemory(chunkSize);
+                buffer.Slice(i * chunkSize, chunkSize).CopyTo(memory);
+                writer.Advance(chunkSize);
+            }
+
+            var remaining = buffer.Length % chunkSize;
+            if (remaining == 0) return;
+
+            var mem = writer.GetMemory(remaining);
+            buffer[^remaining..].CopyTo(mem);
+            writer.Advance(remaining);
         }
     }
 }
