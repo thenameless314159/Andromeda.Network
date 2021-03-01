@@ -154,8 +154,7 @@ namespace Andromeda.Framing
             
             // Should we also complete the pipe ? I don't know since this should be done by the transport
             // that own the pipe, but this is not within the scope of this library so maybe we should...
-            try { pipe?.CancelPendingFlush(); }
-            catch { /* discard all exceptions at this point */}
+            try { pipe?.CancelPendingFlush(); } catch { /* discard all exceptions at this point */}
             finally { semaphore?.Dispose(); }
             GC.SuppressFinalize(this);
         }
@@ -165,10 +164,10 @@ namespace Andromeda.Framing
                 ? _singleWriter.WaitAsync(token) 
                 : Task.CompletedTask;
 
-        protected bool TryWaitForSingleWriter(CancellationToken token = default) =>
+        protected virtual bool TryWaitForSingleWriter(CancellationToken token = default) =>
             _singleWriter is null || _singleWriter.Wait(0, token);
 
-        protected void Release(int framesWritten = 1)
+        protected virtual void Release(int framesWritten = 1)
         {
             // If the access to the pipe is already synchronized, add or increment using Interlocked class
             if (_singleWriter is not null) _framesWritten += framesWritten;
