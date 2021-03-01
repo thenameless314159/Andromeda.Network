@@ -22,7 +22,8 @@ namespace Andromeda.Framing
         /// <summary>
         /// Start the consumption of <see cref="Frame{TMetadata}"/>.
         /// </summary>
+        /// <param name="token">The cancellation token.</param>
         /// <returns>A consumable IAsyncEnumerable of <see cref="Frame{TMetadata}"/>.</returns>
-        new IAsyncEnumerable<Frame<TMetadata>> ReadFramesAsync();
+        new IAsyncEnumerable<Frame<TMetadata>> ReadFramesAsync(CancellationToken token = default);
     }
 }

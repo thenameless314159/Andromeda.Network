@@ -67,7 +67,8 @@ namespace Andromeda.Framing.UnitTests
 
                 var readFrame = await decoder.ReadFrameAsync();
                 _logger.WriteLine("Successfully read " + readFrame.Metadata);
-                Assert.Equal(frame.Payload.ToArray(), readFrame.Payload.ToArray());
+                if(length == 0) Assert.Equal(frame.Payload.IsEmpty, readFrame.Payload.IsEmpty);
+                else Assert.Equal(frame.Payload.ToArray(), readFrame.Payload.ToArray());
                 Assert.Equal(metadata, readFrame.Metadata);
                 Assert.Equal(1, encoder.FramesWritten);
                 Assert.Equal(1, decoder.FramesRead);
@@ -94,7 +95,8 @@ namespace Andromeda.Framing.UnitTests
                     var readFrame = enumerator.Current;
 
                     _logger.WriteLine("Successfully read " + readFrame.Metadata);
-                    Assert.Equal(frame.Payload.ToArray(), readFrame.Payload.ToArray());
+                    if (metadata.Length == 0) Assert.Equal(frame.Payload.IsEmpty, readFrame.Payload.IsEmpty);
+                    else Assert.Equal(frame.Payload.ToArray(), readFrame.Payload.ToArray());
                     Assert.Equal(metadata, readFrame.Metadata);
                 }
 

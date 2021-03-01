@@ -37,7 +37,10 @@ namespace Andromeda.Framing
         public IFrameMetadata Metadata { get; }
 
         /// <returns>Whether the <see cref="IFrameMetadata"/> and payload length of the current <see cref="Frame"/> are lesser than 1 or not.</returns>
-        public bool IsEmpty() =>  Metadata.Length == 0 && Payload.IsEmpty;
+        public bool IsPayloadEmpty() =>  Metadata.Length == 0 && Payload.IsEmpty;
+
+        /// <returns>Whether or not the current <see cref="Frame"/> is a Frame.Empty.</returns>
+        public bool IsEmptyFrame() => Metadata == default! && Payload.IsEmpty;
     }
 
     /// <summary>
@@ -74,6 +77,9 @@ namespace Andromeda.Framing
         public TMetadata Metadata { get; }
 
         /// <returns>Whether the <see cref="IFrameMetadata"/> and payload length of the current <see cref="Frame{TMetadata}"/> are lesser than 1 or not.</returns>
-        public bool IsEmpty() => Metadata.Length == 0 && Payload.IsEmpty;
+        public bool IsPayloadEmpty() => Metadata.Length == 0 && Payload.IsEmpty;
+
+        /// <returns>Whether or not the current <see cref="Frame"/> is a Frame.Empty.</returns>
+        public bool IsEmptyFrame() => Metadata == default! && Payload.IsEmpty;
     }
 }

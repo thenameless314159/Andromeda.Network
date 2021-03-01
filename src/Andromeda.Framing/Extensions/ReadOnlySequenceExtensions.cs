@@ -18,12 +18,9 @@ namespace Andromeda.Framing
             if (metadata!.Length < 0) throw new InvalidOperationException(
                 $"Payload of parsed frame with {metadata} cannot have negative length !");
 
-            if (reader.Remaining < metadata.Length) {
-                frame = new Frame(ReadOnlySequence<byte>.Empty, metadata);
-                return false;
-            }
-            
-            frame = new Frame(buffer.Slice(reader.Position, metadata.Length), metadata);
+            if (reader.Remaining < metadata.Length) return false;
+
+            frame = new Frame(buffer.Slice(reader.Consumed, metadata.Length), metadata);
             return true;
         }
     }

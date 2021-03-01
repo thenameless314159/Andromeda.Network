@@ -22,8 +22,9 @@ namespace Andromeda.Framing
         /// <summary>
         /// Start the consumption of <see cref="Frame"/>.
         /// </summary>
+        /// <param name="token">The cancellation token.</param>
         /// <returns>A consumable IAsyncEnumerable of <see cref="Frame"/>.</returns>
-        IAsyncEnumerable<Frame> ReadFramesAsync();
+        IAsyncEnumerable<Frame> ReadFramesAsync(CancellationToken token = default);
 
         /// <summary>
         /// Get the number of frames read so far with this instance of <see cref="IFrameDecoder"/>.
