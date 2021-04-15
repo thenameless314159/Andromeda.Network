@@ -9,14 +9,25 @@
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<PackageVersion>1.0.0-alpha</PackageVersion>
 		<PackageIcon>andromeda_icon1.png</PackageIcon>
-		<PackageId>Andromeda.Network.Dispatcher</PackageId>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageId>Andromeda.Network.Dispatcher</PackageId>
 		<Copyright>Copyright 2021 thenameless314159</Copyright>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/thenameless314159/Andromeda.Network</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/thenameless314159/Andromeda.Network</PackageProjectUrl>
 		<Description>Implementable dispatcher logic around Andromeda.Framing for length prexifed protocols frame dispatching. (only abstractions are provided currently)</Description>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\andromeda_icon1.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Andromeda.Framing\Andromeda.Framing.csproj" />
