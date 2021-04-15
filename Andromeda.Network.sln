@@ -7,11 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Andromeda.Network", "src\An
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3DA41DC1-D925-4BC9-8585-A9A74719E2DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Andromeda.Framing", "src\Andromeda.Framing\Andromeda.Framing.csproj", "{DA7ED8ED-10AC-4BD2-BDF3-FB2B3BEB3DF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Andromeda.Framing", "src\Andromeda.Framing\Andromeda.Framing.csproj", "{DA7ED8ED-10AC-4BD2-BDF3-FB2B3BEB3DF2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{49793453-CC56-47B4-B168-FE233E747FB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Andromeda.Framing.UnitTests", "tests\Andromeda.Framing.UnitTests\Andromeda.Framing.UnitTests.csproj", "{0C9294B0-6DFD-431D-8061-A2B31412723D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Andromeda.Framing.UnitTests", "tests\Andromeda.Framing.UnitTests\Andromeda.Framing.UnitTests.csproj", "{0C9294B0-6DFD-431D-8061-A2B31412723D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Andromeda.Dispatcher", "src\Andromeda.Dispatcher\Andromeda.Dispatcher.csproj", "{14DC8F0B-309E-4A10-B1F4-5B8FE6DBB579}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,10 @@ Global
 		{0C9294B0-6DFD-431D-8061-A2B31412723D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C9294B0-6DFD-431D-8061-A2B31412723D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C9294B0-6DFD-431D-8061-A2B31412723D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14DC8F0B-309E-4A10-B1F4-5B8FE6DBB579}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14DC8F0B-309E-4A10-B1F4-5B8FE6DBB579}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14DC8F0B-309E-4A10-B1F4-5B8FE6DBB579}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14DC8F0B-309E-4A10-B1F4-5B8FE6DBB579}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +45,7 @@ Global
 		{76B1326B-A8E1-4AC6-8F39-5EDC797BE7A3} = {3DA41DC1-D925-4BC9-8585-A9A74719E2DD}
 		{DA7ED8ED-10AC-4BD2-BDF3-FB2B3BEB3DF2} = {3DA41DC1-D925-4BC9-8585-A9A74719E2DD}
 		{0C9294B0-6DFD-431D-8061-A2B31412723D} = {49793453-CC56-47B4-B168-FE233E747FB8}
+		{14DC8F0B-309E-4A10-B1F4-5B8FE6DBB579} = {3DA41DC1-D925-4BC9-8585-A9A74719E2DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D17B1249-83FB-4BFB-85AF-1525DD3DB2F2}

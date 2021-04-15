@@ -30,3 +30,7 @@ jobs:
     - name: push framing
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: dotnet nuget push Andromeda.Network.Framing.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+
+    - name: push dispatcher
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      run: dotnet nuget push Andromeda.Network.Dispatcher.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
