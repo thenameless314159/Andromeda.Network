@@ -2,7 +2,6 @@
 using System.IO.Pipelines;
 using System.Security.Claims;
 using System.Security.Principal;
-using Andromeda.Network.Client;
 using Microsoft.AspNetCore.Connections;
 
 namespace Andromeda.Dispatcher

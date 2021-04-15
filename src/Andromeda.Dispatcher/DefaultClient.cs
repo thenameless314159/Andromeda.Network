@@ -8,7 +8,7 @@ using Andromeda.Dispatcher.Framing;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace Andromeda.Network.Client
+namespace Andromeda.Dispatcher
 {
     public class DefaultClient : IClient, IClientProxy, IClientFrameProxy, IAsyncDisposable
     {

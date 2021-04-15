@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Threading;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace Andromeda.Network.Client
+namespace Andromeda.Dispatcher
 {
     public interface IClient
     { 

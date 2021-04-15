@@ -1,13 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<Nullable>Enable</Nullable>
-		<Version>1.0.0-alpha</Version>
-		<FileVersion>1.0.0.0</FileVersion>
+		<Version>1.0.1-alpha</Version>
+		<FileVersion>1.0.1.0</FileVersion>
 		<Authors>thenameless314159</Authors>
 		<TargetFramework>net5.0</TargetFramework>
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
-		<PackageVersion>1.0.0-alpha</PackageVersion>
+		<AssemblyVersion>1.0.1.0</AssemblyVersion>
+		<PackageVersion>1.0.1-alpha</PackageVersion>
 		<PackageIcon>andromeda_icon1.png</PackageIcon>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageId>Andromeda.Network.Dispatcher</PackageId>
