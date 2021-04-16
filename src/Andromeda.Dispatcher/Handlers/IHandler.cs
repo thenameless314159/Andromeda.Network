@@ -8,7 +8,7 @@ namespace Andromeda.Dispatcher.Handlers
     {
         CancellationToken RequestAborted => Context.Client.ConnectionClosed;
         IClient Connection => Context.Client;
-        IPrincipal User => Context.Identity;
+        IPrincipal User => Context.User;
 
         IServiceProvider RequestServices { get; set; }
         public SenderContext Context { get; set; }

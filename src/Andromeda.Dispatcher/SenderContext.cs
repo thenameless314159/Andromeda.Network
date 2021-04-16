@@ -8,15 +8,15 @@ namespace Andromeda.Dispatcher
 {
     public record SenderContext
     {
-        public virtual IPrincipal Identity { get; init; }
         public virtual IClientProxy Proxy { get; init; }
+        public virtual IPrincipal User { get; init; }
         public virtual IClient Client { get; init; }
 
         public SenderContext(DefaultClient client, IPrincipal? identity = default) =>
-            (Client, Proxy, Identity) = (client, client, identity ?? new ClaimsPrincipal());
+            (Client, Proxy, User) = (client, client, identity ?? new ClaimsPrincipal());
 
         public SenderContext(IClient client, IClientProxy proxy, IPrincipal? identity = default) =>
-            (Client, Proxy, Identity) = (client, proxy, identity ?? new ClaimsPrincipal());
+            (Client, Proxy, User) = (client, proxy, identity ?? new ClaimsPrincipal());
 
         /// <summary>
         /// Creates a new <see cref="SenderContext"/>.
@@ -32,7 +32,7 @@ namespace Andromeda.Dispatcher
                 : new DefaultConnectionContext();
 
             var client = new DefaultClient(context, parser, reader, writer);
-            Identity = identity ?? new ClaimsPrincipal();
+            User = identity ?? new ClaimsPrincipal();
             Client = client;
             Proxy = client;
         }
