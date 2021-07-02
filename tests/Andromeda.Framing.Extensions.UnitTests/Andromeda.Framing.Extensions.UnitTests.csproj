@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Andromeda.Framing.Extensions\Andromeda.Framing.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\Andromeda.Framing.Extensions\Andromeda.Framing.Extensions.csproj" />
   </ItemGroup>
 
 </Project>

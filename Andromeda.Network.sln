@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Andromeda.Dispatcher", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Andromeda.Framing.Extensions", "src\Andromeda.Framing.Extensions\Andromeda.Framing.Extensions.csproj", "{A864EC64-E3A3-4965-92CC-6FE9256DC42C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Andromeda.Framing.Extensions.UnitTests", "src\Andromeda.Framing.Extensions.UnitTests\Andromeda.Framing.Extensions.UnitTests.csproj", "{2A2B4FDB-3F80-4C80-BC09-F1C789B46DBB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Andromeda.Framing.Extensions.UnitTests", "tests\Andromeda.Framing.Extensions.UnitTests\Andromeda.Framing.Extensions.UnitTests.csproj", "{2A2B4FDB-3F80-4C80-BC09-F1C789B46DBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
