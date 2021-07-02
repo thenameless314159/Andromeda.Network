@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <Nullable>enable</Nullable>
+	  <IsPackable>false</IsPackable>
+	  <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Andromeda.Serialization" Version="1.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Andromeda.Framing\Andromeda.Framing.csproj" />
+  </ItemGroup>
+
+</Project>
