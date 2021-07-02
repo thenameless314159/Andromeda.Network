@@ -14,15 +14,13 @@ namespace Andromeda.Dispatcher
     {
         public CancellationToken ConnectionClosed => _context.ConnectionClosed;
         public IDictionary<object, object?> Items => _context.Items;
-        public IFeatureCollection Features => _context.Features;
         public EndPoint? RemoteEndPoint => _context.RemoteEndPoint;
         public EndPoint? LocalEndPoint => _context.LocalEndPoint;
+        public IFeatureCollection Features => _context.Features;
         public string Id => _context.ConnectionId;
 
         protected internal virtual IFrameMessageEncoder Encoder => _encoder ??= new PipeMessageEncoder(_context.Transport.Output, _parser, _writer, SingleWriter);
-
-        // Only expose the decoder because encoding methods are already provided by the client proxy interfaces
-        public virtual IFrameMessageDecoder Decoder => _decoder ??= new PipeMessageDecoder(_context.Transport.Input, _parser, _reader);
+        protected internal virtual IFrameMessageDecoder Decoder => _decoder ??= new PipeMessageDecoder(_context.Transport.Input, _parser, _reader);
 
         public DefaultClient(ConnectionContext context, IMetadataParser parser,
             IMessageReader? reader = default, IMessageWriter? writer = default) =>
@@ -42,7 +40,12 @@ namespace Andromeda.Dispatcher
         public virtual ValueTask SendAsync(IEnumerable<Frame> frames) => Encoder.WriteAsync(frames, ConnectionClosed);
         public virtual ValueTask SendAsync(IAsyncEnumerable<Frame> frames) => Encoder.WriteAsync(frames, ConnectionClosed);
         public virtual ValueTask SendAsync<TMessage>(in TMessage message) => Encoder.WriteAsync(in message, ConnectionClosed);
-        
+
+        public virtual ValueTask<TMessage?> ReceiveAsync<TMessage>() where TMessage : new() => Decoder.ReadAsync<TMessage>(ConnectionClosed);
+        public virtual IAsyncEnumerable<Frame> ReceiveFramesAsync() => Decoder.ReadFramesAsync(ConnectionClosed);
+        public virtual ValueTask<Frame> ReceiveFrameAsync() => Decoder.ReadFrameAsync(ConnectionClosed);
+
+
         public virtual async ValueTask DisposeAsync() 
         {
             try { // Doesn't dispose the connection context here since its lifetime should be handled by the provider of the instance

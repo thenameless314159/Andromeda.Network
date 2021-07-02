@@ -23,15 +23,8 @@ namespace Andromeda.Network.Transport.Sockets.Client
 
         public SocketConnectionFactory(IOptions<SocketTransportOptions> options, ILoggerFactory loggerFactory)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            if (loggerFactory == null)
-            {
-                throw new ArgumentNullException(nameof(loggerFactory));
-            }
+            if (loggerFactory == null) throw new ArgumentNullException(nameof(loggerFactory));
+            if (options == null) throw new ArgumentNullException(nameof(options));
 
             _options = options.Value;
             _memoryPool = options.Value.MemoryPoolFactory();
@@ -41,20 +34,10 @@ namespace Andromeda.Network.Transport.Sockets.Client
 
         public async ValueTask<ConnectionContext> ConnectAsync(EndPoint endpoint, CancellationToken cancellationToken = default)
         {
-            var ipEndPoint = endpoint as IPEndPoint;
+            if (endpoint is not IPEndPoint ipEndPoint) throw new NotSupportedException("The SocketConnectionFactory only supports IPEndPoints for now.");
+            var socket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp) {NoDelay = _options.NoDelay};
 
-            if (ipEndPoint is null)
-            {
-                throw new NotSupportedException("The SocketConnectionFactory only supports IPEndPoints for now.");
-            }
-
-            var socket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
-            {
-                NoDelay = _options.NoDelay
-            };
-
-            await socket.ConnectAsync(ipEndPoint);
-
+            await socket.ConnectAsync(ipEndPoint, cancellationToken);
             var socketConnection = new SocketConnection(
                 socket,
                 _memoryPool,

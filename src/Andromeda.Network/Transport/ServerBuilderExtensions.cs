@@ -1,4 +1,9 @@
 ﻿using System;
+using Andromeda.Network.Transport.Sockets;
+using Andromeda.Network.Transport.Sockets.Client;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace Andromeda.Network
 {
@@ -12,5 +17,8 @@ namespace Andromeda.Network
             socketsBuilder.Apply(serverBuilder);
             return serverBuilder;
         }
+
+        public static ClientBuilder UseSockets(this ClientBuilder clientBuilder, ILoggerFactory? factory = default) => clientBuilder.UseConnectionFactory(
+            new SocketConnectionFactory(Options.Create(new SocketTransportOptions()), factory ?? NullLoggerFactory.Instance));
     }
 }
