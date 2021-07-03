@@ -8,6 +8,7 @@ namespace Andromeda.Framing.Extensions.UnitTests.Infrastructure
         {
         }
 
+        // would be from a static generic store in real-life scenario
         protected override bool AreMetadataValidFor<T>(T message, IdPrefixedMetadata metadata) => message switch {
             HelloMessage when metadata.MessageId == 1 => true,
             TestMessage when metadata.MessageId == 2 => true,

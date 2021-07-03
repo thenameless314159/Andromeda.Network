@@ -1,15 +1,16 @@
 ﻿using Andromeda.Framing.Extensions.UnitTests.Models;
 using Andromeda.Serialization;
-using System.Buffers;
-using System;
 using System.Buffers.Binary;
+using System.Buffers;
 using System.Text;
+using System;
 
 namespace Andromeda.Framing.Extensions.UnitTests
 {
     internal static class SerializationProvider
     {
         public static readonly ISerDes Serializer = SerializationBuilder.CreateDefault()
+            .Configure<SmallerBytesWrittenMessage>(Serialize)
             .Configure<HelloMessage>(TryDeserialize)
             .Configure<TestMessage>(TryDeserialize)
             .Configure<HelloMessage>(Serialize)
@@ -74,6 +75,12 @@ namespace Andromeda.Framing.Extensions.UnitTests
             buf[0] = value.Flag;
             BinaryPrimitives.WriteInt64LittleEndian(buf[1..], value.Id);
             bytesWritten = sizeof(byte) + sizeof(long);
+        }
+
+        public static void Serialize(ISerializer ser, in Span<byte> buf, SmallerBytesWrittenMessage value, out int bytesWritten)
+        {
+            BinaryPrimitives.WriteInt16LittleEndian(buf[1..], (short)value.Number);
+            bytesWritten = sizeof(short);
         }
     }
 }
