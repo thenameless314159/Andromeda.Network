@@ -1,13 +1,20 @@
-﻿using System.Threading;
+﻿using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Andromeda.Network.Hosting
 {
-    internal sealed class ServerHostedService : IHostedService
+    public class ServerHostedService : IHostedService
     {
-        public ServerHostedService(INetworkServer server) => _server = server;
-        private readonly INetworkServer _server;
+        public ServerHostedService(IOptions<ServerHostedServiceOptions> options) => 
+            _server = options.Value.ServerBuilder.Build();
+
+        private readonly NetworkServer _server;
+
+        public IEnumerable<EndPoint> EndPoints => _server.EndPoints;
 
         public Task StartAsync(CancellationToken cancellationToken) => 
             _server.StartAsync(cancellationToken);

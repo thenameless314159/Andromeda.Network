@@ -16,7 +16,7 @@ namespace Andromeda.Network
         public TimeSpan HeartBeatInterval { get; set; } = TimeSpan.FromSeconds(1);
         public IServiceProvider ApplicationServices { get; }
 
-        public INetworkServer Build() => new NetworkServer(this);
+        public NetworkServer Build() => new(this);
     }
 
     public static partial class ServerBuilderExtensions

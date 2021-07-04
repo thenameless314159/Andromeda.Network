@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Andromeda.Network.Internal;
-using Microsoft.AspNetCore.Connections;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Andromeda.Network
