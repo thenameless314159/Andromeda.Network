@@ -2,18 +2,14 @@
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System;
-using System.Collections;
-using System.Globalization;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
-using Andromeda.Network.Internal;
-using Microsoft.AspNetCore.Server.Kestrel.Core.Features;
+using System.Threading;
+using System.Net;
+using System;
 
 namespace Andromeda.Network
 {
-    internal sealed class ServerConnection : ITimeoutHandler, IConnectionEndPointFeature, IConnectionCompleteFeature, IConnectionHeartbeatFeature, IConnectionLifetimeNotificationFeature
+    internal sealed class ServerConnection : IConnectionEndPointFeature, IConnectionCompleteFeature, IConnectionHeartbeatFeature, IConnectionLifetimeNotificationFeature
     {
         private List<(Action<object> handler, object state)>? _heartbeatHandlers;
         private readonly object _heartbeatLock = new();
@@ -22,7 +18,6 @@ namespace Andromeda.Network
         private bool _completed;
 
         private readonly CancellationTokenSource _connectionClosingCts = new();
-        private readonly TimeoutControl _timeoutControl;
         private readonly ILogger _logger;
 
         public CancellationToken ConnectionClosedRequested { get; set; }
@@ -35,13 +30,9 @@ namespace Andromeda.Network
             Transport = transport;
             _logger = logger;
             Id = id;
-
-            _timeoutControl = new TimeoutControl(this);
-            _timeoutControl.Initialize(DateTimeOffset.UtcNow.Ticks);
-
+            
             transport.Features.Set<IConnectionCompleteFeature>(this);
             transport.Features.Set<IConnectionHeartbeatFeature>(this);
-            transport.Features.Set<IConnectionTimeoutFeature>(_timeoutControl);
             transport.Features.Set<IConnectionLifetimeNotificationFeature>(this);
 
             var endpointFeature = transport.Features[typeof(IConnectionEndPointFeature)];
@@ -71,10 +62,7 @@ namespace Andromeda.Network
 
         public void TickHeartbeat()
         {
-            lock (_heartbeatLock)
-            {
-                // always tick timeout control
-                _timeoutControl.Tick(DateTimeOffset.UtcNow);
+            lock (_heartbeatLock) {
                 if (_heartbeatHandlers is null) return;
 
                 foreach (var (handler, state) in _heartbeatHandlers) handler(state);

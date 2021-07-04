@@ -4,7 +4,6 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO.Pipelines;
 using System.Net.Sockets;
 using System.Threading;
@@ -12,13 +11,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal;
 using Microsoft.Extensions.Logging;
 
 
 namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
 {
-    internal sealed class SocketConnection : ConnectionContext, IApplicationTransportFeature, IConnectionInherentKeepAliveFeature, IMemoryPoolFeature
+    internal sealed class SocketConnection : ConnectionContext, IConnectionInherentKeepAliveFeature, IMemoryPoolFeature
     {
         private static readonly int MinAllocBufferSize = SlabMemoryPool.BlockSize / 2;
         private readonly CancellationTokenSource _connectionClosedTokenSource = new();
@@ -82,7 +80,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
 
             Features = new FeatureCollection();
             Features.Set<IMemoryPoolFeature>(this);
-            Features.Set<IApplicationTransportFeature>(this);
             Features.Set<IConnectionInherentKeepAliveFeature>(this);
         }
 
