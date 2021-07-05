@@ -9,11 +9,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Andromeda.Network;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal;
 
-namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets
+namespace Andromeda.Network.Transport.Sockets
 {
     internal sealed class SocketConnectionListener : IConnectionListener
     {

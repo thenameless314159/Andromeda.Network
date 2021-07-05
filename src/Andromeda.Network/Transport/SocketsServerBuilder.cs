@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Collections.Generic;
 using Andromeda.Network.Internal;
 using Microsoft.AspNetCore.Connections;
-using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
+using Andromeda.Network.Transport.Sockets;
 
 namespace Andromeda.Network
 {

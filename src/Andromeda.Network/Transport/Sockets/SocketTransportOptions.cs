@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using Microsoft.AspNetCore.Connections;
 
-namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets
+namespace Andromeda.Network.Transport.Sockets
 {
     /// <summary>
     /// Options for socket based transports.

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal;
 
-namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets
+namespace Andromeda.Network.Transport.Sockets
 {
     /// <summary>
     /// A factory for socket based connections.

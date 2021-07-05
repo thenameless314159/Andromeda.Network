@@ -11,26 +11,26 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
         // ConnectionRead: Reserved: 3
 
         private static readonly Action<ILogger, string, Exception?> _connectionPause =
-            LoggerMessage.Define<string>(LogLevel.Debug, new EventId(4, "ConnectionPause"), @"Connection id ""{ConnectionId}"" paused.");
+            LoggerMessage.Define<string>(LogLevel.Trace, new EventId(4, "ConnectionPause"), @"Connection id ""{ConnectionId}"" paused.");
 
         private static readonly Action<ILogger, string, Exception?> _connectionResume =
-            LoggerMessage.Define<string>(LogLevel.Debug, new EventId(5, "ConnectionResume"), @"Connection id ""{ConnectionId}"" resumed.");
+            LoggerMessage.Define<string>(LogLevel.Trace, new EventId(5, "ConnectionResume"), @"Connection id ""{ConnectionId}"" resumed.");
 
         private static readonly Action<ILogger, string, Exception?> _connectionReadFin =
-            LoggerMessage.Define<string>(LogLevel.Debug, new EventId(6, "ConnectionReadFin"), @"Connection id ""{ConnectionId}"" received FIN.");
+            LoggerMessage.Define<string>(LogLevel.Trace, new EventId(6, "ConnectionReadFin"), @"Connection id ""{ConnectionId}"" received FIN.");
 
         private static readonly Action<ILogger, string, string, Exception?> _connectionWriteFin =
-            LoggerMessage.Define<string, string>(LogLevel.Debug, new EventId(7, "ConnectionWriteFin"), @"Connection id ""{ConnectionId}"" sending FIN because: ""{Reason}""");
+            LoggerMessage.Define<string, string>(LogLevel.Trace, new EventId(7, "ConnectionWriteFin"), @"Connection id ""{ConnectionId}"" sending FIN because: ""{Reason}""");
 
         // ConnectionWrite: Reserved: 11
 
         // ConnectionWriteCallback: Reserved: 12
 
         private static readonly Action<ILogger, string, Exception?> _connectionError =
-            LoggerMessage.Define<string>(LogLevel.Debug, new EventId(14, "ConnectionError"), @"Connection id ""{ConnectionId}"" communication error.");
+            LoggerMessage.Define<string>(LogLevel.Trace, new EventId(14, "ConnectionError"), @"Connection id ""{ConnectionId}"" communication error.");
 
         private static readonly Action<ILogger, string, Exception?> _connectionReset =
-            LoggerMessage.Define<string>(LogLevel.Debug, new EventId(19, "ConnectionReset"), @"Connection id ""{ConnectionId}"" reset.");
+            LoggerMessage.Define<string>(LogLevel.Trace, new EventId(19, "ConnectionReset"), @"Connection id ""{ConnectionId}"" reset.");
 
         private readonly ILogger _logger;
 
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
 
         public void ConnectionReadFin(SocketConnection connection)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
+            if (_logger.IsEnabled(LogLevel.Trace))
             {
                 _connectionReadFin(_logger, connection.ConnectionId, null);
             }
@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
 
         public void ConnectionWriteFin(SocketConnection connection, string reason)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
+            if (_logger.IsEnabled(LogLevel.Trace))
             {
                 _connectionWriteFin(_logger, connection.ConnectionId, reason, null);
             }
@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
 
         public void ConnectionError(SocketConnection connection, Exception ex)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
+            if (_logger.IsEnabled(LogLevel.Trace))
             {
                 _connectionError(_logger, connection.ConnectionId, ex);
             }
@@ -88,7 +88,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
 
         public void ConnectionReset(SocketConnection connection)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
+            if (_logger.IsEnabled(LogLevel.Trace))
             {
                 _connectionReset(_logger, connection.ConnectionId, null);
             }
@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
 
         public void ConnectionPause(SocketConnection connection)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
+            if (_logger.IsEnabled(LogLevel.Trace))
             {
                 _connectionPause(_logger, connection.ConnectionId, null);
             }
@@ -104,7 +104,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
 
         public void ConnectionResume(SocketConnection connection)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
+            if (_logger.IsEnabled(LogLevel.Trace))
             {
                 _connectionResume(_logger, connection.ConnectionId, null);
             }

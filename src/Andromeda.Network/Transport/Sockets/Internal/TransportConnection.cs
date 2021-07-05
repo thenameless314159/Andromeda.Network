@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO.Pipelines;
 using System.Net;
 using System.Threading;
+using Andromeda.Network.Internal;
 using Microsoft.AspNetCore.Http.Features;
 
 #nullable enable
