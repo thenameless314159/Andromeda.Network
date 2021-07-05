@@ -6,6 +6,11 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="..\ServerApplication\LengthPrefixedMetadataParser.cs" Link="LengthPrefixedMetadataParser.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Andromeda.Framing\Andromeda.Framing.csproj" />
 		<ProjectReference Include="..\..\src\Andromeda.Network\Andromeda.Network.csproj" />
 	</ItemGroup>
 

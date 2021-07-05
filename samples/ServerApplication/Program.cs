@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Andromeda.Network;
 using Applications;
 using System;
+using Protocols;
+using ServerApplication;
 
 var services = new ServiceCollection()
     .AddLogging(builder => builder
@@ -16,6 +18,7 @@ var sp = services.BuildServiceProvider();
 var server = new ServerBuilder(sp)
     .UseSockets(sockets => {
         sockets.ListenLocalhost(5000, c => c.UseConnectionLogging().UseConnectionHandler<EchoServerApplication>(), defaultPolicy);
+        sockets.ListenLocalhost(5001, c => c.UseConnectionHandler<LengthPrefixedApplication>(), defaultPolicy);
     })
     .Build();
 

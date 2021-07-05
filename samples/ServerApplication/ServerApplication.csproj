@@ -6,6 +6,8 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\src\Andromeda.Dispatcher\Andromeda.Dispatcher.csproj" />
+		<ProjectReference Include="..\..\src\Andromeda.Framing\Andromeda.Framing.csproj" />
 		<ProjectReference Include="..\..\src\Andromeda.Network\Andromeda.Network.csproj" />
 	</ItemGroup>
 
