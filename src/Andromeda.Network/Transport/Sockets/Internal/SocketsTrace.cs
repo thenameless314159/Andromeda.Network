@@ -39,20 +39,46 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
             _logger = logger;
         }
 
-        public void ConnectionReadFin(string connectionId)
+        /*public void ConnectionRead(SocketConnection connection, int count)
         {
-            _connectionReadFin(_logger, connectionId, null);
+            // Don't log for now since this could be *too* verbose.
+            // Reserved: Event ID 3
+        }*/
+
+        public void ConnectionReadFin(SocketConnection connection)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _connectionReadFin(_logger, connection.ConnectionId, null);
+            }
         }
 
-        public void ConnectionWriteFin(string connectionId, string reason)
+        public void ConnectionWriteFin(SocketConnection connection, string reason)
         {
-            _connectionWriteFin(_logger, connectionId, reason, null);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _connectionWriteFin(_logger, connection.ConnectionId, reason, null);
+            }
         }
 
-
-        public void ConnectionError(string connectionId, Exception ex)
+        /*public void ConnectionWrite(SocketConnection connection, int count)
         {
-            _connectionError(_logger, connectionId, ex);
+            // Don't log for now since this could be *too* verbose.
+            // Reserved: Event ID 11
+        }*/
+
+        /*public void ConnectionWriteCallback(SocketConnection connection, int status)
+        {
+            // Don't log for now since this could be *too* verbose.
+            // Reserved: Event ID 12
+        }*/
+
+        public void ConnectionError(SocketConnection connection, Exception ex)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _connectionError(_logger, connection.ConnectionId, ex);
+            }
         }
 
         public void ConnectionReset(string connectionId)
@@ -60,14 +86,28 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
             _connectionReset(_logger, connectionId, null);
         }
 
-        public void ConnectionPause(string connectionId)
+        public void ConnectionReset(SocketConnection connection)
         {
-            _connectionPause(_logger, connectionId, null);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _connectionReset(_logger, connection.ConnectionId, null);
+            }
         }
 
-        public void ConnectionResume(string connectionId)
+        public void ConnectionPause(SocketConnection connection)
         {
-            _connectionResume(_logger, connectionId, null);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _connectionPause(_logger, connection.ConnectionId, null);
+            }
+        }
+
+        public void ConnectionResume(SocketConnection connection)
+        {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _connectionResume(_logger, connection.ConnectionId, null);
+            }
         }
 
         public IDisposable BeginScope<TState>(TState state) => _logger.BeginScope(state);

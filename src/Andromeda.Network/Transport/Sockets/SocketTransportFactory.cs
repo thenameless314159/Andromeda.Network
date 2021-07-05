@@ -5,13 +5,12 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Connections;
-using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
-using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal;
 
-namespace Andromeda.Network.Transport.Sockets
+namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets
 {
     /// <summary>
     /// A factory for socket based connections.

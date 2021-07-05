@@ -4,12 +4,11 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Net;
 using System;
 
 namespace Andromeda.Network
 {
-    internal sealed class ServerConnection : IConnectionEndPointFeature, IConnectionCompleteFeature, IConnectionHeartbeatFeature, IConnectionLifetimeNotificationFeature
+    internal sealed class ServerConnection : IConnectionCompleteFeature, IConnectionHeartbeatFeature, IConnectionLifetimeNotificationFeature
     {
         private List<(Action<object> handler, object state)>? _heartbeatHandlers;
         private readonly object _heartbeatLock = new();
@@ -34,21 +33,6 @@ namespace Andromeda.Network
             transport.Features.Set<IConnectionCompleteFeature>(this);
             transport.Features.Set<IConnectionHeartbeatFeature>(this);
             transport.Features.Set<IConnectionLifetimeNotificationFeature>(this);
-
-            var endpointFeature = transport.Features[typeof(IConnectionEndPointFeature)];
-            if (endpointFeature is null) transport.Features.Set<IConnectionEndPointFeature>(this);
-        }
-
-        public EndPoint? LocalEndPoint
-        {
-            get => Transport.LocalEndPoint;
-            set => Transport.LocalEndPoint = value;
-        }
-
-        public EndPoint? RemoteEndPoint
-        {
-            get => Transport.RemoteEndPoint;
-            set => Transport.RemoteEndPoint = value;
         }
 
         public void RequestClose()
@@ -68,8 +52,6 @@ namespace Andromeda.Network
                 foreach (var (handler, state) in _heartbeatHandlers) handler(state);
             }
         }
-
-        public void OnTimeout(string reason) => Transport.Abort(new ConnectionAbortedException(reason));
 
         public void OnHeartbeat(Action<object> action, object state)
         {

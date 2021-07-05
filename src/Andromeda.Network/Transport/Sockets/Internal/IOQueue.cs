@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
 {
     internal class IOQueue : PipeScheduler, IThreadPoolWorkItem
     {
-        private readonly ConcurrentQueue<Work> _workItems = new ConcurrentQueue<Work>();
+        private readonly ConcurrentQueue<Work> _workItems = new();
         private int _doingWork;
 
         public override void Schedule(Action<object?> action, object? state)

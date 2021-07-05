@@ -1,9 +1,8 @@
-﻿using System;
-using Andromeda.Network.Transport.Sockets;
-using Andromeda.Network.Transport.Sockets.Client;
+﻿using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using System;
 
 namespace Andromeda.Network
 {

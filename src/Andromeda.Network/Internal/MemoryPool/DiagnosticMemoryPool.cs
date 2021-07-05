@@ -150,7 +150,7 @@ namespace System.Buffers
 
         private AggregateException CreateAccessExceptions()
         {
-            return new AggregateException("Exceptions occurred while accessing blocks", _blockAccessExceptions.ToArray());
+            return new("Exceptions occurred while accessing blocks", _blockAccessExceptions.ToArray());
         }
 
         public async Task WhenAllBlocksReturnedAsync(TimeSpan timeout)

@@ -42,7 +42,7 @@ namespace System.Buffers
             throw new InvalidOperationException("Object is being disposed twice");
         }
 
-        public static void ThrowInvalidOperationException_BlockDoubleDispose()
+        public static void ThrowInvalidOperationException_BlockDoubleDispose(DiagnosticPoolBlock _)
         {
             throw new InvalidOperationException("Block is being disposed twice");
         }
@@ -69,7 +69,7 @@ namespace System.Buffers
 
         private static string GenerateMessage(string message, params DiagnosticPoolBlock[] blocks)
         {
-            StringBuilder builder = new StringBuilder(message);
+            StringBuilder builder = new(message);
             foreach (var diagnosticPoolBlock in blocks)
             {
                 if (diagnosticPoolBlock.Leaser != null)
@@ -97,13 +97,13 @@ namespace System.Buffers
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static ArgumentOutOfRangeException GetArgumentOutOfRangeException_BufferRequestTooLarge(int maxSize)
         {
-            return new ArgumentOutOfRangeException(GetArgumentName(ExceptionArgument.size), $"Cannot allocate more than {maxSize} bytes in a single buffer");
+            return new(GetArgumentName(ExceptionArgument.size), $"Cannot allocate more than {maxSize} bytes in a single buffer");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static ObjectDisposedException GetObjectDisposedException(ExceptionArgument argument)
         {
-            return new ObjectDisposedException(GetArgumentName(argument));
+            return new(GetArgumentName(argument));
         }
 
         private static string GetArgumentName(ExceptionArgument argument)

@@ -96,19 +96,10 @@ namespace Andromeda.Network
                 transport.ConnectionId, Listener.EndPoint);
 
             try { await execute(transport).ConfigureAwait(false); }
-            catch (ConnectionAbortedException e) when (!string.IsNullOrWhiteSpace(e.Message))
-            {
-                if (!_logPolicy.LogConnectionAborted) return;
-                const string abortedMessage = "Connection with Id={ConnectionId} was aborted on network server at '{EndPoint}' with reason : {Message}";
-                if (e.InnerException is not null) _logger.LogError(e.InnerException, abortedMessage, transport.ConnectionId, Listener.EndPoint, e.Message);
-                else _logger.Log(_logPolicy.MessageLogLevel, abortedMessage, transport.ConnectionId, Listener.EndPoint, e.Message);
-            }
             catch (ConnectionAbortedException) { /* Don't let connection aborted exceptions out */ }
             catch (ConnectionResetException) { /* Don't let connection reset exceptions out */ }
-            catch (Exception e) 
-            {
-                const string errorMessage =
-                    "Connection with Id={ConnectionId} was stopped on network server at '{EndPoint}' because an unexpected exception has been caught.";
+            catch (Exception e) {
+                const string errorMessage = "Unexpected exception caught from connection with Id={ConnectionId} on network server at '{EndPoint}' !";
                 _logger.LogError(e, errorMessage, transport.ConnectionId, Listener.EndPoint);
             }
             finally

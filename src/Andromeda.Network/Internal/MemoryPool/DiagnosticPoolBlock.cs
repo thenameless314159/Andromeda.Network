@@ -21,12 +21,14 @@ namespace System.Buffers
         private readonly DiagnosticMemoryPool _pool;
 
         private readonly IMemoryOwner<byte> _memoryOwner;
-        private readonly Memory<byte> _memory;
         private MemoryHandle? _memoryHandle;
-        
-        private readonly object _syncObj = new ();
+        [Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add read-only modifier", Justification = "<En attente>")]
+        private Memory<byte> _memory;
+
+        private readonly object _syncObj = new();
         private bool _isDisposed;
         private int _pinCount;
+
 
         /// <summary>
         /// This object cannot be instantiated outside of the static Create method
@@ -80,7 +82,7 @@ namespace System.Buffers
 
                     if (_isDisposed)
                     {
-                        MemoryPoolThrowHelper.ThrowInvalidOperationException_BlockDoubleDispose();
+                        MemoryPoolThrowHelper.ThrowInvalidOperationException_BlockDoubleDispose(this);
                     }
 
                     _memoryOwner.Dispose();
