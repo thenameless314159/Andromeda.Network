@@ -5,12 +5,10 @@
 This project is based on the [*Project Bedrock*](https://github.com/aspnet/AspNetCore/issues/4772). This project was made only to suits my personal needs, therefore it has some differences with the original :
 
 - No  protocol logic, only the base socket layers with the same APIs
-- Added an `INetworkServer` interface that expose an `IFeatureCollection` containing an `IServerEndPointsFeature` with the bound endpoints of the configured servers by default. This interface is registered in the relative host service collection when configured using `.ConfigureServer()`.
-- Added an `IConnectionTimeoutFeature` and an `IMemoryPoolFeature` in the server `ConnectionContext`
 - Include latest [`Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets`](https://github.com/dotnet/aspnetcore/tree/main/src/Servers/Kestrel/Transport.Sockets/src) APIs
 - Added configurable logging to server listeners
 
-For further infos about the original project, see the presentation [here](https://speakerdeck.com/davidfowl/project-bedrock).
+For further infos about the original project, you can check the presentation [here](https://speakerdeck.com/davidfowl/project-bedrock) as well as the [original repository](https://github.com/davidfowl/BedrockFramework).
 
 ## Packages
 
@@ -19,4 +17,4 @@ For further infos about the original project, see the presentation [here](https:
 
 ## Documentation
 
-See the [wiki here](https://github.com/thenameless314159/Andromeda.Network/wiki).
+See the [wiki here](https://github.com/thenameless314159/Andromeda.Network/wiki) for futher informations on the framing layer.
