@@ -1,9 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <Nullable>enable</Nullable>
-	  <IsPackable>false</IsPackable>
+	  <Nullable>Enable</Nullable>
+	  <Version>1.0.0</Version>
+	  <FileVersion>1.0.0.0</FileVersion>
+	  <Authors>thenameless314159</Authors>
 	  <TargetFramework>net5.0</TargetFramework>
+	  <AssemblyVersion>1.0.0.0</AssemblyVersion>
+	  <PackageIcon>andromeda_icon1.png</PackageIcon>
+	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
+	  <Copyright>Copyright 2021 thenameless314159</Copyright>
+	  <PackageId>Andromeda.Network.Framing.Extensions</PackageId>
+	  <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	  <RepositoryUrl>https://github.com/thenameless314159/Andromeda.Network</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/thenameless314159/Andromeda.Network</PackageProjectUrl>
+	  <Description>Extensions of Andromeda.Framing using Andromeda.Serialization to encode the payload of frames.</Description>
   </PropertyGroup>
 
   <ItemGroup>
