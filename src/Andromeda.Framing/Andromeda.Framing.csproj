@@ -15,7 +15,6 @@
 	  <RepositoryUrl>https://github.com/thenameless314159/Andromeda.Network</RepositoryUrl>
 	  <PackageProjectUrl>https://github.com/thenameless314159/Andromeda.Network</PackageProjectUrl>
 	  <Description>Implementable framing logic around `System.IO.Pipelines` for length prexifed protocols encoding/decoding.</Description>
-	  
   </PropertyGroup>
 
 	<ItemGroup>
