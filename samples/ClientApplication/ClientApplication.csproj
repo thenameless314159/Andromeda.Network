@@ -6,12 +6,19 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="..\ServerApplication\IdPrefixedProtocolSerialization.cs" Link="IdPrefixedProtocolSerialization.cs" />
 		<Compile Include="..\ServerApplication\LengthPrefixedMetadataParser.cs" Link="LengthPrefixedMetadataParser.cs" />
+		<Compile Include="..\ServerApplication\IdPrefixedProtocolMessages.cs" Link="IdPrefixedProtocolMessages.cs" />
+		<Compile Include="..\ServerApplication\IdPrefixedProtocol.cs" Link="IdPrefixedProtocol.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Andromeda.Framing\Andromeda.Framing.csproj" />
+		<ProjectReference Include="..\..\src\Andromeda.Framing.Extensions\Andromeda.Framing.Extensions.csproj" />
 		<ProjectReference Include="..\..\src\Andromeda.Network\Andromeda.Network.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Andromeda.Serialization.Extensions" Version="1.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>

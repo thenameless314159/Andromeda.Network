@@ -8,37 +8,39 @@ using System.IO;
 using System;
 using System.Text;
 using Andromeda.Framing;
+using Andromeda.Serialization;
+using Andromeda.Sizing;
 using Protocols;
 
-var services = new ServiceCollection()
-    .AddLogging(builder => builder
-        .SetMinimumLevel(LogLevel.Debug)
-        .AddConsole());
+var services = new ServiceCollection().AddLogging(builder => builder
+    .SetMinimumLevel(LogLevel.Debug)
+    .AddConsole());
 
+services.AddDefaultSerialization(sb => sb.UseIdPrefixedProtocolSerialization());
+services.AddDefaultSizing(sb => sb.UseIdPrefixedProtocolSizing());
 var sp = services.BuildServiceProvider();
 
 Console.WriteLine("Samples: ");
 Console.WriteLine("1. Echo Server");
 Console.WriteLine("2. Length Prefixed Protocol Server");
+Console.WriteLine("3. Id Prefixed Protocol Server");
 
 while (true)
 {
     var keyInfo = Console.ReadKey();
+    var application = keyInfo.Key switch {
+        ConsoleKey.D1 => echoServer(sp),
+        ConsoleKey.D2 => lengthPrefixedProtocolServer(sp),
+        ConsoleKey.D3 => idPrefixedProtocolServer(sp),
+        _ => Task.CompletedTask
+    };
 
-    if (keyInfo.Key == ConsoleKey.D1)
-    {
-        Console.WriteLine("Running echo server example");
-        await echoServer(sp);
-    }
-    if (keyInfo.Key == ConsoleKey.D2)
-    {
-        Console.WriteLine("Running length prefixed protocol server example");
-        await lengthPrefixedProtocolServer(sp);
-    }
+    await application;
 }
 
 static async Task echoServer(IServiceProvider serviceProvider)
 {
+    Console.WriteLine("Running echo server example");
     var client = new ClientBuilder(serviceProvider).UseSockets()
         .UseConnectionLogging()
         .Build();
@@ -56,6 +58,7 @@ static async Task echoServer(IServiceProvider serviceProvider)
 
 static async Task lengthPrefixedProtocolServer(IServiceProvider serviceProvider)
 {
+    Console.WriteLine("Running length prefixed protocol server example");
     var client = new ClientBuilder(serviceProvider).UseSockets()
         .UseConnectionLogging()
         .Build();
@@ -75,6 +78,64 @@ static async Task lengthPrefixedProtocolServer(IServiceProvider serviceProvider)
             : Array.Empty<byte>();
 
         await encoder.WriteAsync(new Frame(payload, new DefaultFrameMetadata(payload.Length)), connection.ConnectionClosed);
-        var result = await decoder.ReadFrameAsync(connection.ConnectionClosed);
+        await decoder.ReadFrameAsync(connection.ConnectionClosed);
+    }
+}
+
+static async Task idPrefixedProtocolServer(IServiceProvider serviceProvider)
+{
+    Console.WriteLine("Running id prefixed protocol server example");
+    var client = new ClientBuilder(serviceProvider).UseSockets().Build();
+    await using var connection = await client.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 5002));
+    Console.WriteLine($"Connected to {connection.LocalEndPoint}");
+
+    var parser = new IdPrefixedMetadataParser();
+    var sizing = serviceProvider.GetRequiredService<ISizing>();
+    var serializer = serviceProvider.GetRequiredService<ISerDes>();
+
+    var reader = new IdPrefixedMessageReader(serializer);
+    var writer = new IdPrefixedMessageWriter(parser, serializer, sizing);
+
+    await using var encoder = new PipeMessageEncoder<IdPrefixedMetadata>(connection.Transport.Output, parser, writer);
+    await using var decoder = new PipeMessageDecoder<IdPrefixedMetadata>(connection.Transport.Input, parser, reader);
+
+    var handshake = await decoder.ReadAsync<HandshakeMessage>(connection.ConnectionClosed);
+    if (handshake is null) throw new InvalidOperationException();
+
+    var supportedOperators = string.Join(", ", handshake.SupportedOperators);
+    while (true)
+    {
+        Console.WriteLine($"Type an arithmetic operation using the following supported operator : {supportedOperators}");
+        var line = Console.ReadLine();
+
+        if (!TryParseArithmeticOperation(line, handshake.SupportedOperators, out var operation)) {
+            Console.WriteLine("Invalid operation supplied !");
+            continue;
+        }
+
+        await encoder.WriteAsync(in operation);
+        var result = await decoder.ReadAsync<ArithmeticOperationResult>(connection.ConnectionClosed);
+        Console.WriteLine($"Result : {result!.Result}");
+    }
+
+    static bool TryParseArithmeticOperation(string line, ReadOnlySpan<char> operators, out ArithmeticOperation operation)
+    {
+        operation = null;
+        if (string.IsNullOrWhiteSpace(line)) return false;
+
+        ReadOnlySpan<char> trimmed = line.Trim();
+        foreach (var op in operators) 
+        {
+            var indexOf = trimmed.IndexOf(op);
+            if (indexOf == -1) continue;
+
+            if (!int.TryParse(trimmed[..indexOf], out var left)) return false;
+            if (!int.TryParse(trimmed[(indexOf + 1)..], out var right)) return false;
+
+            operation = new ArithmeticOperation {Left = left, Operator = op, Right = right};
+            return true;
+        }
+
+        return false;
     }
 }

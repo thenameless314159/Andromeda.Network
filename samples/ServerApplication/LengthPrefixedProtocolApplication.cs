@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.AspNetCore.Connections;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Andromeda.Framing;
-using Microsoft.AspNetCore.Connections;
-using Microsoft.Extensions.Logging;
+using System.Text;
 using Protocols;
 
-namespace ServerApplication
+namespace Applications
 {
-    public class LengthPrefixedApplication : ConnectionHandler
+    public class LengthPrefixedProtocolApplication : ConnectionHandler
     {
-        public LengthPrefixedApplication(ILogger<LengthPrefixedApplication> logger) => _logger = logger;
+        public LengthPrefixedProtocolApplication(ILogger<LengthPrefixedProtocolApplication> logger) => _logger = logger;
         private readonly IMetadataParser _parser = new LengthPrefixedMetadataParser();
-        private readonly ILogger<LengthPrefixedApplication> _logger;
+        private readonly ILogger<LengthPrefixedProtocolApplication> _logger;
 
         public override async Task OnConnectedAsync(ConnectionContext connection)
         {
