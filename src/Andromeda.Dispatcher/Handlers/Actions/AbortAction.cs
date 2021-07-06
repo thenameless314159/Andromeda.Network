@@ -14,10 +14,10 @@ namespace Andromeda.Dispatcher.Handlers.Actions
         public Exception? InnerException { get; init; }
         public string? Reason { get; init; }
 
-        public ValueTask ExecuteAsync(SenderContext context)
+        public ValueTask ExecuteAsync(ConnectionContext context)
         {
             if(!string.IsNullOrWhiteSpace(Reason)) {
-                context.Client.Abort(InnerException is not null
+                context.Abort(InnerException is not null
                     ? new ConnectionAbortedException(Reason, InnerException)
                     : new ConnectionAbortedException(Reason));
 
@@ -25,18 +25,18 @@ namespace Andromeda.Dispatcher.Handlers.Actions
             }
 
             if (InnerException is not null) {
-                context.Client.Abort(new ConnectionAbortedException(string.Empty, InnerException));
+                context.Abort(new ConnectionAbortedException(string.Empty, InnerException));
                 return default;
             }
 
             // Try to close the connection gracefully first
-            var lifetimeFeature = context.Client.Features[_lifetimeFeature];
+            var lifetimeFeature = context.Features[_lifetimeFeature];
             if (lifetimeFeature is IConnectionLifetimeNotificationFeature feature) {
                 feature.RequestClose();
                 return default;
             }
 
-            context.Client.Abort();
+            context.Abort();
             return default;
         }
     }

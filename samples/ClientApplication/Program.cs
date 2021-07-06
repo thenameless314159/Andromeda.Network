@@ -1,16 +1,16 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Andromeda.Network.Middleware;
+using Andromeda.Serialization;
 using System.Threading.Tasks;
+using Andromeda.Framing;
 using Andromeda.Network;
+using Andromeda.Sizing;
+using System.Text;
 using System.Net;
 using System.IO;
-using System;
-using System.Text;
-using Andromeda.Framing;
-using Andromeda.Serialization;
-using Andromeda.Sizing;
 using Protocols;
+using System;
 
 var services = new ServiceCollection().AddLogging(builder => builder
     .SetMinimumLevel(LogLevel.Debug)
@@ -96,8 +96,8 @@ static async Task idPrefixedProtocolServer(IServiceProvider serviceProvider)
     var reader = new IdPrefixedMessageReader(serializer);
     var writer = new IdPrefixedMessageWriter(parser, serializer, sizing);
 
-    await using var encoder = new PipeMessageEncoder<IdPrefixedMetadata>(connection.Transport.Output, parser, writer);
-    await using var decoder = new PipeMessageDecoder<IdPrefixedMetadata>(connection.Transport.Input, parser, reader);
+    await using var encoder = connection.Transport.Output.AsFrameMessageEncoder(parser, writer);
+    await using var decoder = connection.Transport.Input.AsFrameMessageDecoder(parser, reader);
 
     var handshake = await decoder.ReadAsync<HandshakeMessage>(connection.ConnectionClosed);
     if (handshake is null) throw new InvalidOperationException();

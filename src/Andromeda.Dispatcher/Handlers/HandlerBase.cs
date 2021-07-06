@@ -12,15 +12,15 @@ namespace Andromeda.Dispatcher.Handlers
             set => _services = value;
         }
 
-        private SenderContext? _context;
+        /*private SenderContext? _context;
         public virtual SenderContext Context {
             get => _context ?? new SenderContext();
             set => _context = value;
-        }
+        }*/
 
-        public virtual IHandlerAction Send<T>(T message) => new SendMessageAction<T>(message);
+        //public virtual IHandlerAction Send<T>(T message) => new SendMessageAction<T>(message);
         public virtual IHandlerAction Abort(string? reason = default, Exception? innerException = default) => new AbortAction(reason, innerException);
-        public virtual IHandlerAction SendAndAbort<T>(T message, string? reason = default, Exception? innerException = default) => 
-            new SendMessageAndAbortAction<T>(message, reason, innerException);
+        /*public virtual IHandlerAction SendAndAbort<T>(T message, string? reason = default, Exception? innerException = default) => 
+            new SendMessageAndAbortAction<T>(message, reason, innerException);*/
     }
 }

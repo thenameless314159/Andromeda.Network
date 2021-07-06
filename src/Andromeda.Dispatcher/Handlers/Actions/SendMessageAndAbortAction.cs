@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Connections.Features;
 
 namespace Andromeda.Dispatcher.Handlers.Actions
 {
-    public class SendMessageAndAbortAction<T> : IHandlerAction
+    /*public class SendMessageAndAbortAction<T> : IHandlerAction
     {
         private static readonly Type _lifetimeFeature = typeof(IConnectionLifetimeNotificationFeature);
         public SendMessageAndAbortAction(T message, string? reason = default, Exception? innerException = default) =>
@@ -46,5 +46,5 @@ namespace Andromeda.Dispatcher.Handlers.Actions
                 finally { Abort(); }
             }
         }
-    }
+    }*/
 }

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Andromeda.Framing;
 
-namespace Andromeda.Dispatcher
+namespace Andromeda.Network.Client
 {
     public interface IClientFrameProxy
     {

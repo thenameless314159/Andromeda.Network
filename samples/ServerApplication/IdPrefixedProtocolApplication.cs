@@ -27,8 +27,8 @@ namespace Applications
 
         public override async Task OnConnectedAsync(ConnectionContext connection)
         {
-            await using var encoder = new PipeMessageEncoder<IdPrefixedMetadata>(connection.Transport.Output, _parser, _writer);
-            await using var decoder = new PipeMessageDecoder<IdPrefixedMetadata>(connection.Transport.Input, _parser, _reader);
+            await using var encoder = connection.Transport.Output.AsFrameMessageEncoder(_parser, _writer);
+            await using var decoder = connection.Transport.Input.AsFrameMessageDecoder(_parser, _reader);
 
             try {
                 await encoder.WriteAsync(_handshake);

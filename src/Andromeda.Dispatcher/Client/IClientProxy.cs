@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Andromeda.Dispatcher
+namespace Andromeda.Network.Client
 {
     public interface IClientProxy
     {

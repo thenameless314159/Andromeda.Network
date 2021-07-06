@@ -30,12 +30,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Andromeda.Framing\Andromeda.Framing.csproj" />
+		<PackageReference Include="Microsoft.AspNetCore.Connections.Abstractions" Version="5.0.7" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Connections.Abstractions" Version="5.0.5" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+	  <ProjectReference Include="..\Andromeda.Framing.Extensions\Andromeda.Framing.Extensions.csproj" />
 	</ItemGroup>
 
 </Project>
