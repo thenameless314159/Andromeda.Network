@@ -14,7 +14,8 @@ For further infos about the original project, you can check the presentation [he
 
 - Andromeda.Network : [![NuGet Badge](https://buildstats.info/nuget/Andromeda.Network)](https://www.nuget.org/packages/Andromeda.Network/)
 - Andromeda.Framing : [![NuGet Badge](https://buildstats.info/nuget/Andromeda.Network.Framing)](https://www.nuget.org/packages/Andromeda.Network.Framing/)
+- Andromeda.Framing.Extensions : [![NuGet Badge](https://buildstats.info/nuget/Andromeda.Network.Framing.Extensions)](https://www.nuget.org/packages/Andromeda.Network.Framing.Extensions/)
 
 ## Documentation
 
-See the [wiki here](https://github.com/thenameless314159/Andromeda.Network/wiki) for futher informations on the framing layer.
+See the [wiki here](https://github.com/thenameless314159/Andromeda.Network/wiki/Andromeda.Framing) for futher informations on the framing layer.
