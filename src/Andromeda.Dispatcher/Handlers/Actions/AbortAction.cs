@@ -14,7 +14,7 @@ namespace Andromeda.Dispatcher.Handlers.Actions
         public Exception? InnerException { get; init; }
         public string? Reason { get; init; }
 
-        public ValueTask ExecuteAsync(ConnectionContext context)
+        public ValueTask ExecuteAsync(SenderContext context)
         {
             if(!string.IsNullOrWhiteSpace(Reason)) {
                 context.Abort(InnerException is not null

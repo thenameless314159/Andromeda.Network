@@ -4,9 +4,10 @@ namespace Andromeda.Dispatcher.Handlers
 {
     public abstract class FrameHandler<TMeta> : FrameHandler where TMeta : class, IFrameMetadata
     {
+        private Frame<TMeta>? _frame;
         public new Frame<TMeta> Request {
-            get => base.Request.AsTyped<TMeta>();
-            set => base.Request = value.AsUntyped();
+            get => _frame ?? Frame<TMeta>.Empty;
+            set => _frame = value;
         }
     }
 }

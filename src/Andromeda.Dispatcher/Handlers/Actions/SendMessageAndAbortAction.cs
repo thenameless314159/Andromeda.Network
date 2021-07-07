@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Connections.Features;
 
 namespace Andromeda.Dispatcher.Handlers.Actions
 {
-    /*public class SendMessageAndAbortAction<T> : IHandlerAction
+    public class SendMessageAndAbortAction<T> : IHandlerAction
     {
         private static readonly Type _lifetimeFeature = typeof(IConnectionLifetimeNotificationFeature);
         public SendMessageAndAbortAction(T message, string? reason = default, Exception? innerException = default) =>
@@ -15,16 +15,17 @@ namespace Andromeda.Dispatcher.Handlers.Actions
         public Exception? InnerException { get; init; }
         public string? Reason { get; init; }
         private readonly T _message;
+
         public ValueTask ExecuteAsync(SenderContext context)
         {
-            var sendAsync = context.Proxy.SendAsync(in _message);
+            var sendAsync = context.SendAsync(in _message);
             if (!sendAsync.IsCompletedSuccessfully) return awaitSendAndAbort(sendAsync);
             Abort(); return default;
 
             void Abort()
             {
                 if (!string.IsNullOrWhiteSpace(Reason)) {
-                    context.Client.Abort(InnerException is not null
+                    context.Abort(InnerException is not null
                         ? new ConnectionAbortedException(Reason, InnerException)
                         : new ConnectionAbortedException(Reason));
 
@@ -32,12 +33,12 @@ namespace Andromeda.Dispatcher.Handlers.Actions
                 }
 
                 if (InnerException is not null) {
-                    context.Client.Abort(new ConnectionAbortedException(string.Empty, InnerException));
+                    context.Abort(new ConnectionAbortedException(string.Empty, InnerException));
                     return;
                 }
 
                 // Try to close the connection gracefully first
-                var lifetimeFeature = context.Client.Features[_lifetimeFeature];
+                var lifetimeFeature = context.Features[_lifetimeFeature];
                 if (lifetimeFeature is not IConnectionLifetimeNotificationFeature feature) return;
                 feature.RequestClose();
             }
@@ -46,5 +47,5 @@ namespace Andromeda.Dispatcher.Handlers.Actions
                 finally { Abort(); }
             }
         }
-    }*/
+    }
 }
