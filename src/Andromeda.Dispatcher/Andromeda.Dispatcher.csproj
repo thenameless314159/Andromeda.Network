@@ -2,12 +2,12 @@
 
 	<PropertyGroup>
 		<Nullable>Enable</Nullable>
-		<Version>1.0.3-alpha</Version>
-		<FileVersion>1.0.3.0</FileVersion>
+		<Version>1.0.4-alpha</Version>
+		<FileVersion>1.0.4.0</FileVersion>
 		<Authors>thenameless314159</Authors>
 		<TargetFramework>net5.0</TargetFramework>
-		<AssemblyVersion>1.0.3.0</AssemblyVersion>
-		<PackageVersion>1.0.3-alpha</PackageVersion>
+		<AssemblyVersion>1.0.4.0</AssemblyVersion>
+		<PackageVersion>1.0.4-alpha</PackageVersion>
 		<PackageIcon>andromeda_icon1.png</PackageIcon>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageId>Andromeda.Network.Dispatcher</PackageId>
@@ -15,7 +15,7 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/thenameless314159/Andromeda.Network</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/thenameless314159/Andromeda.Network</PackageProjectUrl>
-		<Description>Implementable dispatcher logic around Andromeda.Framing for length prexifed protocols frame dispatching. (only abstractions are provided currently)</Description>
+		<Description>Implementable dispatcher logic around Andromeda.Framing for length prexifed protocols frame dispatching.</Description>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -31,6 +31,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Connections.Abstractions" Version="5.0.7" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

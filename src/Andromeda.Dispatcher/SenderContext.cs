@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Buffers;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Andromeda.Framing;
@@ -10,25 +12,18 @@ namespace Andromeda.Dispatcher
 {
     public abstract class SenderContext : IClient, IClientProxy, IClientFrameProxy
     {
-        public CancellationToken ConnectionClosed => _transport.ConnectionClosed;
-        public IDictionary<object, object?> Items => _transport.Items;
-        public IFeatureCollection Features => _transport.Features;
-        public string Id => _transport.ConnectionId;
+        public abstract CancellationToken ConnectionClosed { get; }
+        public abstract IDictionary<object, object?> Items { get; }
+        public abstract IFeatureCollection Features { get; }
+        public abstract string Id { get; }
 
-        protected SenderContext(ConnectionContext transport, IFrameMessageEncoder encoder) { 
-            _transport = transport;
-            Encoder = encoder;
-        }
+        public abstract ValueTask SendAsync(in Frame frame);
+        public abstract ValueTask SendAsync<T>(in T message);
+        public abstract ValueTask SendAsync(IEnumerable<Frame> frames);
+        public abstract ValueTask SendAsync(IAsyncEnumerable<Frame> frames);
 
-        protected internal virtual IFrameMessageEncoder Encoder { get; }
-        protected internal readonly ConnectionContext _transport;
-
-        public void Abort(ConnectionAbortedException abortedException) => _transport.Abort(abortedException);
-        public void Abort() => _transport.Abort();
-
-        public ValueTask SendAsync(in Frame frame) => Encoder.WriteAsync(in frame, _transport.ConnectionClosed);
-        public ValueTask SendAsync(IEnumerable<Frame> frames) => Encoder.WriteAsync(frames, _transport.ConnectionClosed);
-        public ValueTask SendAsync(IAsyncEnumerable<Frame> frames) => Encoder.WriteAsync(frames, _transport.ConnectionClosed);
-        public ValueTask SendAsync<TMessage>(in TMessage message) => Encoder.WriteAsync(in message, _transport.ConnectionClosed);
+        public abstract void Abort(ConnectionAbortedException abortReason);
+        public abstract void Abort();
+        
     }
 }
