@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Connections;
+using Andromeda.Dispatcher.Handlers;
 using Microsoft.Extensions.Logging;
 using Andromeda.Network.Middleware;
 using Andromeda.Serialization;
@@ -10,7 +11,6 @@ using Andromeda.Framing;
 using Applications;
 using Protocols;
 using System;
-using Andromeda.Dispatcher.Handlers;
 
 var services = new ServiceCollection().AddLogging(builder => builder
     .SetMinimumLevel(LogLevel.Debug)
