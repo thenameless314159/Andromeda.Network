@@ -2,12 +2,12 @@
 
 	<PropertyGroup>
 		<Nullable>Enable</Nullable>
-		<Version>1.0.4-alpha</Version>
-		<FileVersion>1.0.4.0</FileVersion>
+		<Version>1.0.5-alpha</Version>
+		<FileVersion>1.0.5.0</FileVersion>
 		<Authors>thenameless314159</Authors>
 		<TargetFramework>net5.0</TargetFramework>
-		<AssemblyVersion>1.0.4.0</AssemblyVersion>
-		<PackageVersion>1.0.4-alpha</PackageVersion>
+		<AssemblyVersion>1.0.5.0</AssemblyVersion>
+		<PackageVersion>1.0.5-alpha</PackageVersion>
 		<PackageIcon>andromeda_icon1.png</PackageIcon>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageId>Andromeda.Network.Dispatcher</PackageId>

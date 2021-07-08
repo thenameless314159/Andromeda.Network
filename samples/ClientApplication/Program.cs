@@ -16,14 +16,13 @@ var services = new ServiceCollection().AddLogging(builder => builder
     .SetMinimumLevel(LogLevel.Debug)
     .AddConsole());
 
-services.AddDefaultSerialization(sb => sb.UseIdPrefixedProtocolSerialization());
-services.AddDefaultSizing(sb => sb.UseIdPrefixedProtocolSizing());
 var sp = services.BuildServiceProvider();
 
 Console.WriteLine("Samples: ");
 Console.WriteLine("1. Echo Server");
 Console.WriteLine("2. Length Prefixed Protocol Server");
 Console.WriteLine("3. Id Prefixed Protocol Server");
+Console.WriteLine("4. Id Prefixed Protocol With Message Dispatcher Server");
 
 while (true)
 {
@@ -32,6 +31,7 @@ while (true)
         ConsoleKey.D1 => echoServer(sp),
         ConsoleKey.D2 => lengthPrefixedProtocolServer(sp),
         ConsoleKey.D3 => idPrefixedProtocolServer(sp),
+        ConsoleKey.D4 => idPrefixedProtocolServer(sp, 5003),
         _ => Task.CompletedTask
     };
 
@@ -82,16 +82,21 @@ static async Task lengthPrefixedProtocolServer(IServiceProvider serviceProvider)
     }
 }
 
-static async Task idPrefixedProtocolServer(IServiceProvider serviceProvider)
+static async Task idPrefixedProtocolServer(IServiceProvider serviceProvider, int port = 5002)
 {
     Console.WriteLine("Running id prefixed protocol server example");
     var client = new ClientBuilder(serviceProvider).UseSockets().Build();
-    await using var connection = await client.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 5002));
+    await using var connection = await client.ConnectAsync(new IPEndPoint(IPAddress.Loopback, port));
     Console.WriteLine($"Connected to {connection.LocalEndPoint}");
 
     var parser = new IdPrefixedMetadataParser();
-    var sizing = serviceProvider.GetRequiredService<ISizing>();
-    var serializer = serviceProvider.GetRequiredService<ISerDes>();
+    var sizing = SizingBuilder.CreateDefault()
+        .UseIdPrefixedProtocolSizing()
+        .Build();
+
+    var serializer = SerializationBuilder.CreateDefault()
+        .UseIdPrefixedProtocolSerialization()
+        .Build();
 
     var reader = new IdPrefixedMessageReader(serializer);
     var writer = new IdPrefixedMessageWriter(parser, serializer, sizing);

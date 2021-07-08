@@ -24,6 +24,17 @@ namespace Andromeda.Framing
             where TMetadata : class, IFrameMetadata => new PipeFrameDecoder<TMetadata>(r, decoder);
 
         /// <summary>
+        /// Create an <see cref="IFrameDecoder{TMetadata}"/> from the specified <see cref="PipeReader"/> using the provided <see cref="MetadataDecoder{TMetadata}"/>.
+        /// </summary>
+        /// <typeparam name="TMetadata">The specific <see cref="IFrameMetadata"/>.</typeparam>
+        /// <param name="r">The pipe reader.</param>
+        /// <param name="decoder">The metadata decoder.</param>
+        /// <returns>An <see cref="IFrameDecoder{TMetadata}"/> instance.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IFrameDecoder<TMetadata> AsFrameDecoder<TMetadata>(this PipeReader r, MetadataParser<TMetadata> decoder)
+            where TMetadata : class, IFrameMetadata => new PipeFrameDecoder<TMetadata>(r, decoder);
+
+        /// <summary>
         /// Create an <see cref="IFrameDecoder"/> from the specified <see cref="PipeReader"/> using the provided <see cref="IMetadataDecoder"/>.
         /// </summary>
         /// <param name="r">The pipe reader.</param>

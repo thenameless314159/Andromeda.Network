@@ -19,26 +19,36 @@ namespace Andromeda.Framing
         /// <typeparam name="TMetadata">The specific <see cref="IFrameMetadata"/>.</typeparam>
         /// <param name="w">The pipe writer.</param>
         /// <param name="encoder">The metadata encoder.</param>
-        /// <param name="usePipeSynchronization">Whether the access to the pipe should be thread synchronized or not.</param>
+        /// <param name="singleWriter">Whether the access to the pipe should be thread synchronized or not.</param>
         /// <returns>An <see cref="IFrameEncoder{TMetadata}"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IFrameEncoder<TMetadata> AsFrameEncoder<TMetadata>(this PipeWriter w, MetadataEncoder<TMetadata> encoder, bool usePipeSynchronization = false)
-            where TMetadata : class, IFrameMetadata => new PipeFrameEncoder<TMetadata>(w, encoder, usePipeSynchronization ? new SemaphoreSlim(1, 1) : default);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static IFrameEncoder<TMetadata> AsFrameEncoder<TMetadata>(this PipeWriter w, IMetadataEncoder encoder, bool usePipeSynchronization = false)
-            where TMetadata : class, IFrameMetadata => new PipeFrameEncoder<TMetadata>(w, encoder, usePipeSynchronization ? new SemaphoreSlim(1, 1) : default);
+        public static IFrameEncoder<TMetadata> AsFrameEncoder<TMetadata>(this PipeWriter w, MetadataEncoder<TMetadata> encoder, bool singleWriter = false)
+            where TMetadata : class, IFrameMetadata => new PipeFrameEncoder<TMetadata>(w, encoder, singleWriter ? new SemaphoreSlim(1, 1) : default);
 
         /// <summary>
         /// Create an <see cref="IFrameEncoder"/> from the specified <see cref="PipeWriter"/> using the provided <see cref="IMetadataEncoder"/>.
         /// </summary>
         /// <param name="w">The pipe writer.</param>
         /// <param name="encoder">The metadata encoder.</param>
-        /// <param name="usePipeSynchronization">Whether the access to the pipe should be thread synchronized or not.</param>
+        /// <param name="singleWriter">Whether the access to the pipe should be thread synchronized or not.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IFrameEncoder<TMetadata> AsFrameEncoder<TMetadata>(this PipeWriter w, MetadataParser<TMetadata> encoder, bool singleWriter = false)
+            where TMetadata : class, IFrameMetadata => new PipeFrameEncoder<TMetadata>(w, encoder, singleWriter ? new SemaphoreSlim(1, 1) : default);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static IFrameEncoder<TMetadata> AsFrameEncoder<TMetadata>(this PipeWriter w, IMetadataEncoder encoder, bool singleWriter = false)
+            where TMetadata : class, IFrameMetadata => new PipeFrameEncoder<TMetadata>(w, encoder, singleWriter ? new SemaphoreSlim(1, 1) : default);
+
+        /// <summary>
+        /// Create an <see cref="IFrameEncoder"/> from the specified <see cref="PipeWriter"/> using the provided <see cref="IMetadataEncoder"/>.
+        /// </summary>
+        /// <param name="w">The pipe writer.</param>
+        /// <param name="encoder">The metadata encoder.</param>
+        /// <param name="singleWriter">Whether the access to the pipe should be thread synchronized or not.</param>
         /// <returns>An <see cref="IFrameEncoder"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IFrameEncoder AsFrameEncoder(this PipeWriter w, IMetadataEncoder encoder, bool usePipeSynchronization = false) =>
-            new PipeFrameEncoder(w, encoder, usePipeSynchronization ? new SemaphoreSlim(1, 1) : default);
+        public static IFrameEncoder AsFrameEncoder(this PipeWriter w, IMetadataEncoder encoder, bool singleWriter = false) =>
+            new PipeFrameEncoder(w, encoder, singleWriter ? new SemaphoreSlim(1, 1) : default);
 
 
         /// <summary>

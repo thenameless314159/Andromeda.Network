@@ -5,6 +5,6 @@
     /// </summary>
     public interface IMessageMetadata : IFrameMetadata
     {
-        int MessageId { get; set; }
+        int MessageId { get; }
     }
 }

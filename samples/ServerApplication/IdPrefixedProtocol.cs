@@ -7,7 +7,8 @@ using Andromeda.Serialization;
 
 namespace Protocols
 {
-    public record IdPrefixedMetadata(short MessageId, int Length) : IFrameMetadata;
+    public record IdPrefixedMetadata(int MessageId, int Length) : IMessageMetadata;
+
     public class IdPrefixedMetadataParser : MetadataParser<IdPrefixedMetadata>
     {
         protected override bool TryParse(ref SequenceReader<byte> input, out IdPrefixedMetadata metadata)
@@ -21,7 +22,7 @@ namespace Protocols
 
         protected override void Write(ref Span<byte> span, IdPrefixedMetadata metadata)
         {
-            BinaryPrimitives.WriteInt16BigEndian(span, metadata.MessageId);
+            BinaryPrimitives.WriteInt16BigEndian(span, (short)metadata.MessageId);
             BinaryPrimitives.WriteInt32BigEndian(span[2..], metadata.Length);
         }
 
