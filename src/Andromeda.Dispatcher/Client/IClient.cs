@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace Andromeda.Network.Client
+namespace Andromeda.Dispatcher.Client
 {
     public interface IClient
     {

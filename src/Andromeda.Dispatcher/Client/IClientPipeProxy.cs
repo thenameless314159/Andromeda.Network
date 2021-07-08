@@ -2,7 +2,7 @@
 using System.Buffers;
 using System.Threading.Tasks;
 
-namespace Andromeda.Network.Client
+namespace Andromeda.Dispatcher.Client
 {
     public interface IClientPipeProxy
     {
