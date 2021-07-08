@@ -24,7 +24,7 @@ Console.WriteLine("Samples: ");
 Console.WriteLine("1. Echo Server");
 Console.WriteLine("2. Length Prefixed Protocol Server");
 Console.WriteLine("3. Id Prefixed Protocol Server");
-Console.WriteLine("4. Id Prefixed Protocol With Message Dispatcher Server");
+Console.WriteLine("4. Id Prefixed Protocol Server With Message Dispatcher ");
 
 while (true)
 {
@@ -107,7 +107,7 @@ static async Task idPrefixedProtocolServer(IServiceProvider serviceProvider, int
     var supportedOperators = string.Join(", ", handshake.SupportedOperators);
     while (true)
     {
-        Console.WriteLine($"Type an arithmetic operation using the following supported operator : {supportedOperators}");
+        Console.WriteLine($"Type an arithmetic operation using the following supported operators : {supportedOperators}");
         var line = Console.ReadLine();
 
         if (!TryParseArithmeticOperation(line, handshake.SupportedOperators, out var operation)) {
