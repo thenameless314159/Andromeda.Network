@@ -37,25 +37,24 @@ namespace Applications
 
         public override async Task OnConnectedAsync(ConnectionContext connection)
         {
-            await using var encoder = connection.Transport.Output.AsFrameMessageEncoder(_parser, _writer);
+            await using var client = new DefaultSenderContext(connection, _parser, _writer);
             await using var decoder = connection.Transport.Input.AsFrameDecoder(_parser);
-
+            
             try
             {
-                await encoder.WriteAsync(_handshake);
+                await client.SendAsync(_handshake);
                 _logger.LogInformation("{Message} was successfully sent to connection with Id={ConnectionId} !", nameof(HandshakeMessage), connection.ConnectionId);
 
-                var context = new DefaultSenderContext(connection, encoder);
                 await foreach (var frame in decoder.ReadFramesAsync(connection.ConnectionClosed)) 
                 {
                     _logger.LogDebug("Received a frame with {Metadata} from connection with Id={ConnectionId}", frame.Metadata, connection.ConnectionId);
-                    var result = await _dispatcher.OnFrameReceivedAsync(in frame, context);
+                    var result = await _dispatcher.OnFrameReceivedAsync(in frame, client);
 
                     if (result == DispatchResult.Success)
                         _logger.LogDebug(
                             "Successfully handled received frame with {Metadata} from connection with Id={Id}!",
                             frame.Metadata, connection.ConnectionId);
-                    else 
+                    else
                         _logger.LogWarning(
                             "Couldn't handle received frame with {Metadata} from connection with Id={Id} ! Result : {result}",
                             frame.Metadata, connection.ConnectionId, result);
@@ -73,7 +72,7 @@ namespace Applications
         public override async IAsyncEnumerable<IHandlerAction> OnMessageReceivedAsync()
         {
             _logger.LogInformation("Received an arithmetic operation to process from connection with Id={ConnectionId} : {Operation}",
-                Context.Id, string.Join(' ', Message.Left, Message.Operator, Message.Right));
+                Context.ConnectionId, string.Join(' ', Message.Left, Message.Operator, Message.Right));
 
             await Task.Delay(100); // remove async warning
             var result = Message.Operator switch {
@@ -88,7 +87,7 @@ namespace Applications
 
             yield return Send(new ArithmeticOperationResult {Result = result});
             _logger.LogInformation("Successfully processed arithmetic operation from connection with Id={ConnectionId}, result : {result}",
-                Context.Id, result);
+                Context.ConnectionId, result);
         }
     }
 }

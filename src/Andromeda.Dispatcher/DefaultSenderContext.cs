@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Andromeda.Dispatcher
 {
-    public class DefaultSenderContext : SenderContextConnection
+    public class DefaultSenderContext : SenderContext
     {
         public DefaultSenderContext(ConnectionContext connection, IMetadataEncoder encoder, IMessageWriter writer, SemaphoreSlim? singleWriter = default) 
             : this(connection, connection.Transport.Output.AsFrameMessageEncoder(encoder, writer, singleWriter))
@@ -21,5 +21,7 @@ namespace Andromeda.Dispatcher
         public override ValueTask SendAsync(IEnumerable<Frame> frames) => _encoder.WriteAsync(frames, _context.ConnectionClosed);
         public override ValueTask SendAsync(IAsyncEnumerable<Frame> frames) => _encoder.WriteAsync(frames, _context.ConnectionClosed);
         public override ValueTask SendAsync<T>(in T message) => _encoder.WriteAsync(in message, _context.ConnectionClosed);
+
+        public override ValueTask DisposeAsync() => _encoder.DisposeAsync();
     }
 }

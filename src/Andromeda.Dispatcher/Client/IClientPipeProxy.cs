@@ -6,7 +6,6 @@ namespace Andromeda.Dispatcher.Client
 {
     public interface IClientPipeProxy
     {
-        ValueTask SendAsync(in ReadOnlySpan<byte> buffer);
         ValueTask SendAsync(in ReadOnlyMemory<byte> buffer);
         ValueTask SendAsync(in ReadOnlySequence<byte> buffer);
     }

@@ -10,7 +10,7 @@ namespace Andromeda.Dispatcher.Client
         CancellationToken ConnectionClosed { get; }
         IDictionary<object, object?> Items { get; }
         IFeatureCollection Features { get; }
-        string Id { get; }
+        string ConnectionId { get; }
        
         void Abort(ConnectionAbortedException abortedException);
         void Abort();

@@ -2,7 +2,7 @@
 
 namespace Andromeda.Dispatcher.Client
 {
-    public interface IClientProxy
+    public interface IClientMessageProxy
     {
         ValueTask SendAsync<TMessage>(in TMessage message);
     }
