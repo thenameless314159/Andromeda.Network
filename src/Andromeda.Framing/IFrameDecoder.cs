@@ -9,7 +9,7 @@ namespace Andromeda.Framing
     /// Represent a mechanism to read single <see cref="Frame"/> or consume them
     /// via an IAsyncEnumerable.
     /// </summary>
-    public interface IFrameDecoder : IAsyncDisposable, IDisposable
+    public interface IFrameDecoder : IAsyncDisposable, IDisposable, IAsyncEnumerable<Frame>
     {
         /// <summary>
         /// Read a single <see cref="Frame"/> from the underlying reader.
